@@ -41,6 +41,7 @@ export default [
   'Greek',
   'Guarani',
   'Hausa',
+  'Hawaiian',
   'Hebrew',
   'Hindi',
   'Hittite',

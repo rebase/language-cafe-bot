@@ -144,7 +144,7 @@ export default async (interaction) => {
 
   const title = 'How to Use the find-study-buddy Channel';
 
-  const description = `Click the blue text here </register-my-study-buddy-listing:${config.REGISTER_MY_STUDY_BUDDY_LISTING_COMMAND_ID}> and send it to input your study buddy listing in our database.\n\nStill have questions? Click the link here https://discord.com/channels/739911855795077282/1230684714415820890/1230684919483859036 for a step-by-step explanation and video tutorial.`;
+  const description = `Click the blue text here </register-my-study-buddy-listing:${config.REGISTER_MY_STUDY_BUDDY_LISTING_COMMAND_ID}> and send it to input your study buddy listing in our database.\n\nWhen you find someone to match with, you can get in contact with them by:\n1. DMing them\n2. Pinging them in this channel (if they don’t have their DMs open)\n\nStill have questions? Click the link here https://discord.com/channels/739911855795077282/1230684714415820890/1230684919483859036 for a step-by-step explanation and video tutorial.\n\nOnce you have established contact, you can continue to chat in DMs or sign up for a partner forum here https://discord.com/channels/739911855795077282/1446947496046755925.`;
 
   const currentMessages = await interaction.client.channels.cache
     .get(channelId)
