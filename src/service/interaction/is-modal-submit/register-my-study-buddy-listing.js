@@ -134,7 +134,7 @@ export default async (interaction) => {
       {
         color: COLORS.PRIMARY,
         title: 'You have successfully registered your study buddy listing.',
-        description: `Now, click the blue text right here </get-study-buddy-listings:${config.GET_STUDY_BUDDY_LISTINGS_COMMAND_ID}> and send it to show all potential study buddies.\n\nIf nobody shows up, that just means that there isn't a perfect match for you in our database yet. Make sure to come back in the future to try again!`,
+        description: `Now, click the blue text right here </get-study-buddy-listings:${config.GET_STUDY_BUDDY_LISTINGS_COMMAND_ID}> and send it to show all potential study buddies.\n\nIf nobody shows up, that just means that there isn't a perfect match for you in our database yet. Make sure to come back in the future to try again!\n\nOnce you have found someone who you are interested in partnering up with, you can reach out to them via DMs (if their DMs are open) and ask to be partners. If not, you can ping them in this channel and ask. If their name does not pop up when you try to ping them, then they have left the server, so you should find another partner.`,
       },
     ],
     ephemeral: true,
@@ -144,7 +144,7 @@ export default async (interaction) => {
 
   const title = 'How to Use the find-study-buddy Channel';
 
-  const description = `Click the blue text here </register-my-study-buddy-listing:${config.REGISTER_MY_STUDY_BUDDY_LISTING_COMMAND_ID}> and send it to input your study buddy listing in our database.\n\nStill have questions? Click the link here https://discord.com/channels/739911855795077282/1230684714415820890/1230684919483859036 for a step-by-step explanation and video tutorial.`;
+  const description = `Click the blue text here </register-my-study-buddy-listing:${config.REGISTER_MY_STUDY_BUDDY_LISTING_COMMAND_ID}> and send it to input your study buddy listing in our database.\n\nWhen you find someone to match with, you can get in contact with them by:\n1. DMing them\n2. Pinging them in this channel (if they don’t have their DMs open)\n\nStill have questions? Click the link here https://discord.com/channels/739911855795077282/1230684714415820890/1230684919483859036 for a step-by-step explanation and video tutorial.\n\nOnce you have established contact, you can continue to chat in DMs or sign up for a partner forum here https://discord.com/channels/739911855795077282/1446947496046755925.`;
 
   const currentMessages = await interaction.client.channels.cache
     .get(channelId)
