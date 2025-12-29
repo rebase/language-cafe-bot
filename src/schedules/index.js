@@ -2,6 +2,7 @@ import schedule from 'node-schedule';
 import checkIfPassTheCoffeeCupLastMessageIsValid from '../service/schedules/check-if-pass-the-coffee-cup-last-message-is-valid.js';
 import sendANewMatchMatchMessage from '../service/schedules/send-a-new-match-match-message.js';
 import initializePoint from '../service/schedules/initialize-point.js';
+import checkAndSendReminders from '../service/schedules/check-and-send-reminders.js';
 
 export default function schedules() {
   // every 10 seconds
@@ -12,6 +13,7 @@ export default function schedules() {
   // every hour
   schedule.scheduleJob('0 * * * *', () => {
     checkIfPassTheCoffeeCupLastMessageIsValid();
+    checkAndSendReminders();
   });
 
   // every day at 00:00
