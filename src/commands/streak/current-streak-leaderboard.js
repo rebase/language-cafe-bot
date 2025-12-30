@@ -1,6 +1,6 @@
 import { SlashCommandBuilder, bold, time, userMention } from 'discord.js';
 import { COLORS } from '../../constants/index.js';
-import { studyCheckInKeyv } from '../../db/keyvInstances.js';
+import StudyCheckIn from '../../models/StudyCheckIn.js';
 import channelLog, {
   generateInteractionCreateLogContent,
 } from '../../service/utils/channel-log.js';
@@ -12,17 +12,14 @@ export default {
   async execute(interaction) {
     channelLog(generateInteractionCreateLogContent(interaction));
 
-    const userObject = await studyCheckInKeyv.get('user');
-    const propertyNames = Object.keys(userObject);
+    const allUsers = await StudyCheckIn.find({ point: { $gt: 0 } });
 
-    const havePointsPropertyNames = propertyNames.filter((key) => userObject[key].point > 0);
-
-    const userList = havePointsPropertyNames.map((key) => ({
-      id: key,
-      point: userObject[key].point,
-      lastAttendanceTimestamp: userObject[key].lastAttendanceTimestamp,
-      expiredTimestamp: userObject[key].expiredTimestamp,
-      freezePoint: userObject[key].freezePoint || 0,
+    const userList = allUsers.map((user) => ({
+      id: user.userId,
+      point: user.point,
+      lastAttendanceTimestamp: user.lastAttendanceTimestamp,
+      expiredTimestamp: user.expiredTimestamp,
+      freezePoint: user.freezePoint || 0,
     }));
 
     const currentTimestamp = Date.now();

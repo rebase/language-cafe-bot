@@ -1,6 +1,6 @@
 import { SlashCommandBuilder, bold, time, userMention } from 'discord.js';
 import { COLORS } from '../../constants/index.js';
-import { studyCheckInKeyv } from '../../db/keyvInstances.js';
+import StudyCheckIn from '../../models/StudyCheckIn.js';
 import channelLog, {
   generateInteractionCreateLogContent,
 } from '../../service/utils/channel-log.js';
@@ -12,19 +12,16 @@ export default {
   async execute(interaction) {
     channelLog(generateInteractionCreateLogContent(interaction));
 
-    const userObject = await studyCheckInKeyv.get('user');
-    const propertyNames = Object.keys(userObject);
+    const allUsers = await StudyCheckIn.find({ highestPoint: { $gt: 0 } });
 
-    const filteredUsers = propertyNames
-      .filter((key) => userObject[key].highestPoint > 0)
-      .filter((key) => interaction.guild.members.cache.has(key));
-
-    const userList = filteredUsers.map((key) => ({
-      id: key,
-      lastAttendanceTimestamp: userObject[key].lastAttendanceTimestamp,
-      expiredTimestamp: userObject[key].expiredTimestamp,
-      highestPoint: userObject[key].highestPoint,
-    }));
+    const userList = allUsers
+      .filter((user) => interaction.guild.members.cache.has(user.userId))
+      .map((user) => ({
+        id: user.userId,
+        lastAttendanceTimestamp: user.lastAttendanceTimestamp,
+        expiredTimestamp: user.expiredTimestamp,
+        highestPoint: user.highestPoint,
+      }));
 
     const rankedUserList = [...userList].sort(
       (a, b) =>

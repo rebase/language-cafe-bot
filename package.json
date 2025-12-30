@@ -8,8 +8,7 @@
     "dev": "nodemon .",
     "start": "NODE_ENV=production node .",
     "deploy-commands:dev": "node src/deploy-commands.js",
-    "deploy-commands": "NODE_ENV=production node src/deploy-commands.js",
-    "sync-sqlite": "node src/sync-sqlite.js"
+    "deploy-commands": "NODE_ENV=production node src/deploy-commands.js"
   },
   "keywords": [],
   "author": "",
@@ -19,14 +18,10 @@
     "chance": "^1.1.11",
     "discord.js": "^14.13.0",
     "jsdom": "^22.1.0",
-    "keyv": "^4.5.4",
-    "keyv-file": "^0.2.0",
     "latinize": "^2.0.0",
     "mongoose": "^8.9.5",
     "node-schedule": "^2.1.1",
-    "nodemon": "^3.0.1",
-    "sequelize": "^6.33.0",
-    "sqlite3": "^5.1.6"
+    "nodemon": "^3.0.1"
   },
   "devDependencies": {
     "eslint": "^8.51.0",

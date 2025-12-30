@@ -13,7 +13,7 @@ export default {
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
   execute: async (interaction) => {
-    const members = await NewMember.findAll();
+    const members = await NewMember.find();
     let content = '';
 
     if (members.length === 0) {
@@ -40,7 +40,7 @@ export default {
       ephemeral: true,
     });
 
-    await NewMember.destroy({ truncate: true });
+    await NewMember.deleteMany({});
 
     channelLog(
       generateInteractionCreateLogContent(interaction, `content: ${contentWithCodeBlock}`),

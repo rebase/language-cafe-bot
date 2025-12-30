@@ -81,33 +81,15 @@ export default async (interaction) => {
   const refinedTargetLanguage = targetLanguageArray.join(', ');
   const refinedOfferedLanguage = offeredLanguageArray.join(', ');
 
-  const exchangePartner = await ExchangePartner.findOne({
-    where: {
-      id: interaction.member.user.id,
-    },
-  });
-
-  if (exchangePartner) {
-    await ExchangePartner.update(
-      {
-        targetLanguage: refinedTargetLanguage,
-        offeredLanguage: refinedOfferedLanguage,
-        introduction,
-      },
-      {
-        where: {
-          id: interaction.member.user.id,
-        },
-      },
-    );
-  } else {
-    await ExchangePartner.create({
-      id: interaction.member.user.id,
+  await ExchangePartner.findOneAndUpdate(
+    { id: interaction.member.user.id },
+    {
       targetLanguage: refinedTargetLanguage,
       offeredLanguage: refinedOfferedLanguage,
       introduction,
-    });
-  }
+    },
+    { upsert: true, new: true },
+  );
 
   await interaction.reply({
     embeds: [

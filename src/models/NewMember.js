@@ -1,9 +1,19 @@
-import Sequelize from 'sequelize';
-import sequelize from '../db/sqliteInstance.js';
+import mongoose from 'mongoose';
 
-export default sequelize.define('newMember', {
-  id: {
-    type: Sequelize.STRING,
-    primaryKey: true,
+const { Schema } = mongoose;
+
+const newMember = new Schema(
+  {
+    id: {
+      type: String,
+      required: true,
+      unique: true,
+    },
   },
-});
+  {
+    timestamps: true,
+    versionKey: false,
+  },
+);
+
+export default mongoose.model('new_member', newMember, 'new_members');

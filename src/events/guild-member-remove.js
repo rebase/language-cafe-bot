@@ -4,8 +4,6 @@ import NewMember from '../models/NewMember.js';
 export default {
   name: Events.GuildMemberRemove,
   execute: async (member) => {
-    NewMember.destroy({
-      where: { id: member.id },
-    });
+    await NewMember.deleteOne({ id: member.id });
   },
 };

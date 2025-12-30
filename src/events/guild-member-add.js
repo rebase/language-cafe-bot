@@ -4,9 +4,7 @@ import NewMember from '../models/NewMember.js';
 export default {
   name: Events.GuildMemberAdd,
   execute: async (member) => {
-    const newMember = await NewMember.findOne({
-      where: { id: member.id },
-    });
+    const newMember = await NewMember.findOne({ id: member.id });
 
     if (newMember) {
       return;

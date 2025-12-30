@@ -13,7 +13,7 @@ export default {
   async execute(interaction) {
     channelLog(generateInteractionCreateLogContent(interaction));
 
-    ExchangePartner.destroy({ where: { id: interaction.user.id } });
+    await ExchangePartner.deleteOne({ id: interaction.user.id });
 
     const content = `${userMention(
       interaction.user.id,

@@ -4,7 +4,6 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import client from './client/index.js';
 import config from './config/index.js';
-import { studyCheckInKeyv } from './db/keyvInstances.js';
 import mongoDBConnect from './lib/mongo-db.js';
 import schedules from './schedules/index.js';
 import PomodoroGroup from './models/pomodoro-group.js';
@@ -18,14 +17,6 @@ client.commands = new Collection();
 
 const foldersPath = path.join(__dirname, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
-
-// init file db file
-// eslint-disable-next-line no-console
-studyCheckInKeyv.on('error', (err) => console.error('studyCheckInKeyv connection error:', err));
-
-if (!(await studyCheckInKeyv.has('user'))) {
-  await studyCheckInKeyv.set('user', []);
-}
 
 // eslint-disable-next-line no-restricted-syntax
 for (const folder of commandFolders) {

@@ -1,7 +1,7 @@
 import { bold, time, userMention } from 'discord.js';
 import config from '../../config/index.js';
 import { COLORS } from '../../constants/index.js';
-import { studyCheckInKeyv } from '../../db/keyvInstances.js';
+import StudyCheckIn from '../../models/StudyCheckIn.js';
 import channelLog, { generateMessageCreateLogContent } from '../utils/channel-log.js';
 
 const sendNewStickyMessage = async (message) => {
@@ -56,8 +56,7 @@ export default async (message) => {
     return;
   }
 
-  const users = await studyCheckInKeyv.get('user');
-  const user = users[message.author.id];
+  const user = await StudyCheckIn.findOne({ userId: message.author.id });
 
   const currentDate = new Date();
   const nextDayTemp = new Date(currentDate);
@@ -138,16 +137,17 @@ export default async (message) => {
     freezePoint = freezePoint < 3 ? freezePoint + 1 : freezePoint;
   }
 
-  await studyCheckInKeyv.set('user', {
-    ...users,
-    [message.author.id]: {
+  await StudyCheckIn.findOneAndUpdate(
+    { userId: message.author.id },
+    {
       point,
       lastAttendanceTimestamp: currentTimestamp,
       expiredTimestamp,
       highestPoint,
       freezePoint,
     },
-  });
+    { upsert: true, new: true },
+  );
 
   if (
     point <= 50

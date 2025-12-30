@@ -1,21 +1,31 @@
-import Sequelize from 'sequelize';
-import sequelize from '../db/sqliteInstance.js';
+import mongoose from 'mongoose';
 
-export default sequelize.define('exchangePartner', {
-  id: {
-    type: Sequelize.STRING,
-    primaryKey: true,
+const { Schema } = mongoose;
+
+const exchangePartner = new Schema(
+  {
+    id: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    targetLanguage: {
+      type: String,
+      required: true,
+    },
+    offeredLanguage: {
+      type: String,
+      required: true,
+    },
+    introduction: {
+      type: String,
+      required: true,
+    },
   },
-  targetLanguage: {
-    type: Sequelize.STRING,
-    required: true,
+  {
+    timestamps: true,
+    versionKey: false,
   },
-  offeredLanguage: {
-    type: Sequelize.STRING,
-    required: true,
-  },
-  introduction: {
-    type: Sequelize.STRING,
-    required: true,
-  },
-});
+);
+
+export default mongoose.model('exchange_partner', exchangePartner, 'exchange_partners');

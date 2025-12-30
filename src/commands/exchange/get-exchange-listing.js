@@ -6,7 +6,6 @@ import {
   time,
   userMention,
 } from 'discord.js';
-import { Op } from 'sequelize';
 import client from '../../client/index.js';
 import { COLORS } from '../../constants/index.js';
 import ExchangePartner from '../../models/ExchangePartner.js';
@@ -22,10 +21,10 @@ export default {
   async execute(interaction) {
     channelLog(generateInteractionCreateLogContent(interaction));
 
-    const clientTargetLanguage = await ExchangePartner.findOne({
-      where: { id: interaction.user.id },
-      attributes: ['targetLanguage', 'offeredLanguage'],
-    });
+    const clientTargetLanguage = await ExchangePartner.findOne(
+      { id: interaction.user.id },
+      'targetLanguage offeredLanguage',
+    );
 
     if (!clientTargetLanguage) {
       await interaction.reply({
@@ -46,28 +45,20 @@ export default {
     const clientTargetLanguageArray = clientTargetLanguage.targetLanguage.split(', ');
     const clientOfferedLanguageArray = clientTargetLanguage.offeredLanguage.split(', ');
 
-    const offeredLanguageDynamicSearchConditions = clientTargetLanguageArray.map((keyword) => ({
-      offeredLanguage: {
-        [Op.substring]: keyword,
-      },
-    }));
+    const offeredLanguageRegex = clientTargetLanguageArray
+      .map((keyword) => keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+      .join('|');
 
-    const targetLanguageDynamicSearchConditions = clientOfferedLanguageArray.map((keyword) => ({
-      targetLanguage: {
-        [Op.substring]: keyword,
-      },
-    }));
+    const targetLanguageRegex = clientOfferedLanguageArray
+      .map((keyword) => keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+      .join('|');
 
-    const SearchCondition = {
-      [Op.and]: [
-        { [Op.or]: offeredLanguageDynamicSearchConditions },
-        { [Op.or]: targetLanguageDynamicSearchConditions },
-      ],
+    const searchCondition = {
+      offeredLanguage: { $regex: offeredLanguageRegex, $options: 'i' },
+      targetLanguage: { $regex: targetLanguageRegex, $options: 'i' },
     };
 
-    const partnerListLength = await ExchangePartner.count({
-      where: SearchCondition,
-    });
+    const partnerListLength = await ExchangePartner.countDocuments(searchCondition);
 
     if (partnerListLength === 0) {
       await interaction.reply({
@@ -86,10 +77,7 @@ export default {
       return;
     }
 
-    const partner = await ExchangePartner.findOne({
-      where: SearchCondition,
-      order: [['updatedAt', 'DESC']],
-    });
+    const partner = await ExchangePartner.findOne(searchCondition).sort({ updatedAt: -1 });
 
     const partnerObject = await client.users.fetch(partner.id);
 
