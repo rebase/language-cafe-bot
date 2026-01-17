@@ -3,6 +3,7 @@ import studyCheckIn from '../service/messageCreate/study-check-in.js';
 import suggestionBoxMessageCreate from '../service/messageCreate/suggestion-box.js';
 import passTheCoffeeCup from '../service/messageCreate/pass-the-coffee-cup.js';
 import passTheEmoji from '../service/messageCreate/emoji-blend.js';
+import trackerCheckin from '../service/messageCreate/tracker-checkin.js';
 import config from '../config/index.js';
 import categories from '../service/messageCreate/categories.js';
 import counting from '../service/messageCreate/counting.js';
@@ -24,6 +25,12 @@ export default {
   name: Events.MessageCreate,
   async execute(message) {
     if (message.author.bot) return;
+
+    // Handle !checkin commands in forum threads
+    if (message.content.startsWith('!checkin')) {
+      trackerCheckin(message);
+      return;
+    }
 
     // #study-check-in
     if (message.channel.id === studyCheckInChannelId) {
