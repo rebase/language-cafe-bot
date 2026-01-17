@@ -21,13 +21,6 @@ export default async function createTracker(interaction) {
       });
       return;
     }
-    // Debug logging
-    console.log('Channel type:', interaction.channel.type);
-    console.log('Is thread:', interaction.channel.isThread());
-    console.log('Parent exists:', !!interaction.channel.parent);
-    if (interaction.channel.parent) {
-      console.log('Parent type:', interaction.channel.parent.type);
-    }
 
     // Validate this is a thread
     if (!isForumThread(interaction.channel)) {

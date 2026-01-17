@@ -167,7 +167,6 @@ export async function updateLiveTracker(trackerId, channel) {
         return;
       } catch (error) {
         // Message not found, create new one
-        console.log('Live tracker message not found, creating new one');
       }
     }
 
