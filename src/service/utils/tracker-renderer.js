@@ -1,7 +1,7 @@
 import Tracker from '../../models/tracker.js';
 import TrackerParticipant from '../../models/tracker-participant.js';
 import TrackerCheckin from '../../models/tracker-checkin.js';
-import { getStartOfDay, getTrackerWeek, CELL_EMOJIS } from './tracker-utils.js';
+import { getStartOfDay, CELL_EMOJIS } from './tracker-utils.js';
 
 /**
  * Generate the live tracker embed for a given tracker

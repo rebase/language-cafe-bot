@@ -1,6 +1,6 @@
 import { COLORS } from '../../../constants/index.js';
 import Tracker from '../../../models/tracker.js';
-import { isForumThread, getStartOfDay } from '../../utils/tracker-utils.js';
+import { isForumThread } from '../../utils/tracker-utils.js';
 import channelLog from '../../utils/channel-log.js';
 
 export default async function createTracker(interaction) {
