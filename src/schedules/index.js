@@ -3,6 +3,8 @@ import checkIfPassTheCoffeeCupLastMessageIsValid from '../service/schedules/chec
 import sendANewMatchMatchMessage from '../service/schedules/send-a-new-match-match-message.js';
 import initializePoint from '../service/schedules/initialize-point.js';
 import checkAndSendReminders from '../service/schedules/check-and-send-reminders.js';
+import trackerDailyMaintenance from '../service/schedules/tracker-daily-maintenance.js';
+import trackerWeeklySnapshots from '../service/schedules/tracker-weekly-snapshots.js';
 
 export default function schedules() {
   // every 10 seconds
@@ -19,6 +21,12 @@ export default function schedules() {
   // every day at 00:00
   schedule.scheduleJob('0 0 * * *', () => {
     sendANewMatchMatchMessage();
+    trackerDailyMaintenance();
+  });
+
+  // every Sunday at 01:00 (weekly snapshots)
+  schedule.scheduleJob('0 1 * * 0', () => {
+    trackerWeeklySnapshots();
   });
 
   // every month on the first day at 00:00
