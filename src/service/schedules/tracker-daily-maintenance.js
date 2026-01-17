@@ -102,18 +102,16 @@ async function checkParticipantForBan(tracker, participant, graceCutoff, today) 
       }
     } else if (tracker.frequency === 'weekly') {
       // Check each tracker week
-      const trackerStartDate = getStartOfDay(tracker.startDate);
-
       // Calculate which weeks this participant should have checked in
       const startWeek = Math.floor(
-        (startDate.getTime() - trackerStartDate.getTime()) / (1000 * 60 * 60 * 24 * 7),
+        (startDate.getTime() - trackerStart.getTime()) / (1000 * 60 * 60 * 24 * 7),
       );
       const endWeek = Math.floor(
-        (endDate.getTime() - trackerStartDate.getTime()) / (1000 * 60 * 60 * 24 * 7),
+        (endDate.getTime() - trackerStart.getTime()) / (1000 * 60 * 60 * 24 * 7),
       );
 
       for (let week = startWeek; week <= endWeek; week++) {
-        const weekStart = new Date(trackerStartDate);
+        const weekStart = new Date(trackerStart);
         weekStart.setDate(weekStart.getDate() + week * 7);
         const weekEnd = new Date(weekStart);
         weekEnd.setDate(weekEnd.getDate() + 6);

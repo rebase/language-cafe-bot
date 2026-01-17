@@ -88,8 +88,6 @@ export async function generateLiveTrackerEmbed(trackerId) {
         } else {
           // No check-in - determine if it should be ❌ or ⬜
           const joinDate = getStartOfDay(participant.joinedAt);
-          const trackerStart = getStartOfDay(tracker.startDate);
-          const trackerEnd = getStartOfDay(tracker.endDate);
 
           // Only show cells for dates within tracker period and after user joined
           if (date >= Math.max(joinDate, trackerStart) && date <= trackerEnd && date <= today) {
