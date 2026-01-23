@@ -45,7 +45,7 @@ const data = new SlashCommandBuilder()
   .addIntegerOption((option) =>
     option
       .setName('max_misses')
-      .setDescription('Max total misses before ban (optional)')
+      .setDescription('Max misses before ban (days for daily, weeks for weekly trackers)')
       .setMinValue(0)
       .setRequired(false),
   )

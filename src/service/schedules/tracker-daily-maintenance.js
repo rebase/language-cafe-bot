@@ -101,15 +101,35 @@ async function checkParticipantForBan(tracker, participant, graceCutoff, today) 
         }
       }
     } else if (tracker.frequency === 'weekly') {
-      // Check each tracker week
-      // Calculate which weeks this participant should have checked in
-      const startWeek = Math.floor(
-        (startDate.getTime() - trackerStart.getTime()) / (1000 * 60 * 60 * 24 * 7),
-      );
-      const endWeek = Math.floor(
-        (endDate.getTime() - trackerStart.getTime()) / (1000 * 60 * 60 * 24 * 7),
+      // For weekly trackers, count missed weeks using trackerWeek field
+      const trackerStart = getStartOfDay(tracker.startDate);
+      const trackerEnd = getStartOfDay(tracker.endDate);
+
+      // Calculate total weeks in tracker period
+      const totalWeeks = Math.ceil(
+        (trackerEnd.getTime() - trackerStart.getTime()) / (1000 * 60 * 60 * 24 * 7),
       );
 
+      // Get weeks where user should have checked in (after they joined)
+      const joinWeek = Math.floor(
+        (joinDate.getTime() - trackerStart.getTime()) / (1000 * 60 * 60 * 24 * 7),
+      );
+      const currentWeek = Math.floor(
+        (today.getTime() - trackerStart.getTime()) / (1000 * 60 * 60 * 24 * 7),
+      );
+
+      const startWeek = Math.max(0, joinWeek);
+      const endWeek = Math.min(totalWeeks - 1, currentWeek);
+
+      // Get all weeks where user has checked in
+      const checkedInWeeks = new Set();
+      checkins.forEach((checkin) => {
+        if (checkin.trackerWeek !== null && checkin.trackerWeek !== undefined) {
+          checkedInWeeks.add(checkin.trackerWeek);
+        }
+      });
+
+      // Count missed weeks (past grace period)
       for (let week = startWeek; week <= endWeek; week++) {
         const weekStart = new Date(trackerStart);
         weekStart.setDate(weekStart.getDate() + week * 7);
@@ -117,16 +137,8 @@ async function checkParticipantForBan(tracker, participant, graceCutoff, today) 
         weekEnd.setDate(weekEnd.getDate() + 6);
 
         // Check if this week is past grace period
-        if (weekEnd <= graceCutoff) {
-          // Check if user has any check-in in this week
-          const weekCheckins = checkins.filter((checkin) => {
-            const checkinDate = getStartOfDay(checkin.date);
-            return checkinDate >= weekStart && checkinDate <= weekEnd;
-          });
-
-          if (weekCheckins.length === 0) {
-            finalMisses++;
-          }
+        if (weekEnd <= graceCutoff && !checkedInWeeks.has(week)) {
+          finalMisses++;
         }
       }
     }
@@ -173,7 +185,7 @@ async function banParticipant(tracker, participant) {
             {
               color: 0xff0000,
               title: '🚫 Participant Removed',
-              description: `<@${participant.userId}> has been removed from the tracker for exceeding the maximum number of misses (${tracker.maxMisses}). Their emoji ${participant.emoji} is now available for others.`,
+              description: `<@${participant.userId}> has been removed from the tracker for exceeding the maximum number of misses (${tracker.maxMisses} ${tracker.frequency === 'weekly' ? 'weeks' : 'days'}). Their emoji ${participant.emoji} is now available for others.`,
             },
           ],
         });
