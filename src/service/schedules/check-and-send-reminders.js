@@ -63,7 +63,7 @@ export default async function checkAndSendReminders() {
         const mentions = subscribers.map((user) => `<@${user.id}>`).join(' ');
 
         // Send reminder message
-        const reminderMessage = `${mentions} There's ${timeText} left to participate in the event! See more details here: ${reminder.messageUrl}`;
+        const reminderMessage = `## There's ${timeText} left to participate in the event! See more details here: ${reminder.messageUrl}\n-# ${mentions}`;
 
         await channel.send(reminderMessage);
 
