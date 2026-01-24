@@ -1,5 +1,5 @@
-import Reminder from '../../models/reminder.js';
 import client from '../../client/index.js';
+import Reminder from '../../models/reminder.js';
 import channelLog from '../utils/channel-log.js';
 
 export default async function checkAndSendReminders() {

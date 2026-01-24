@@ -1,11 +1,11 @@
-import Tracker from '../../models/tracker.js';
-import TrackerParticipant from '../../models/tracker-participant.js';
 import TrackerCheckin from '../../models/tracker-checkin.js';
+import TrackerParticipant from '../../models/tracker-participant.js';
+import Tracker from '../../models/tracker.js';
 import {
+  CELL_EMOJIS,
   getStartOfDay,
   getTrackerWeek,
   getTrackerWeekStart,
-  CELL_EMOJIS,
 } from './tracker-utils.js';
 
 /**
@@ -106,7 +106,7 @@ async function generateWeeklyTrackerEmbed(tracker) {
   // Check if content exceeds Discord limits
   if (trackerText.length > 4000) {
     trackerText = `Tracker too large to display (${participants.length} participants)\n`;
-    trackerText += `Use individual commands to check progress.`;
+    trackerText += 'Use individual commands to check progress.';
   }
 
   return {
@@ -233,7 +233,7 @@ async function generateDailyTrackerEmbed(tracker) {
   if (trackerText.length > 4000) {
     // Fallback to simpler format if too long
     trackerText = `Tracker too large to display (${participants.length} participants)\n`;
-    trackerText += `Use individual commands to check progress.`;
+    trackerText += 'Use individual commands to check progress.';
   }
 
   return {

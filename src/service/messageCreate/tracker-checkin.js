@@ -1,14 +1,14 @@
-import Tracker from '../../models/tracker.js';
-import TrackerParticipant from '../../models/tracker-participant.js';
 import TrackerCheckin from '../../models/tracker-checkin.js';
+import TrackerParticipant from '../../models/tracker-participant.js';
+import Tracker from '../../models/tracker.js';
+import channelLog from '../utils/channel-log.js';
+import { updateLiveTracker } from '../utils/tracker-renderer.js';
 import {
-  isForumThread,
   getStartOfDay,
   getTrackerWeek,
   isDateInTrackerPeriod,
+  isForumThread,
 } from '../utils/tracker-utils.js';
-import { updateLiveTracker } from '../utils/tracker-renderer.js';
-import channelLog from '../utils/channel-log.js';
 
 export default async function trackerCheckin(message) {
   try {
@@ -64,7 +64,7 @@ export default async function trackerCheckin(message) {
 
       try {
         targetDate = new Date(args[2] + 'T00:00:00.000Z');
-        if (isNaN(targetDate.getTime())) {
+        if (Number.isNaN(targetDate.getTime())) {
           throw new Error('Invalid date');
         }
       } catch (error) {

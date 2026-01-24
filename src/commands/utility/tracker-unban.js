@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
+import { PermissionFlagsBits, SlashCommandBuilder } from 'discord.js';
 import unbanFromTracker from '../../service/interaction/is-chat-input-command/unban-from-tracker.js';
 import channelLog, {
   generateInteractionCreateLogContent,

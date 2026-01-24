@@ -1,7 +1,7 @@
 import { COLORS } from '../../../constants/index.js';
 import Tracker from '../../../models/tracker.js';
-import { isForumThread } from '../../utils/tracker-utils.js';
 import channelLog from '../../utils/channel-log.js';
+import { isForumThread } from '../../utils/tracker-utils.js';
 
 export default async function createTracker(interaction) {
   await interaction.deferReply();
@@ -65,7 +65,7 @@ export default async function createTracker(interaction) {
       startDate = new Date(startDateStr + 'T00:00:00.000Z');
       endDate = new Date(endDateStr + 'T23:59:59.999Z');
 
-      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
         throw new Error('Invalid date format');
       }
     } catch (error) {

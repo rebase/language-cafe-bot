@@ -79,7 +79,9 @@ export default async (interaction) => {
 
   const page = +offset + 1;
 
-  const partner = await ExchangePartner.findOne(searchCondition).sort({ updatedAt: -1 }).skip(offset);
+  const partner = await ExchangePartner.findOne(searchCondition)
+    .sort({ updatedAt: -1 })
+    .skip(offset);
 
   if (!partner) {
     await interaction.update({

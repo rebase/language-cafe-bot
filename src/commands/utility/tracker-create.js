@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
+import { PermissionFlagsBits, SlashCommandBuilder } from 'discord.js';
 import createTracker from '../../service/interaction/is-chat-input-command/create-tracker.js';
 import channelLog, {
   generateInteractionCreateLogContent,

@@ -254,9 +254,12 @@ export default async (message) => {
   message.react('🔥').catch(() => {});
 
   const replyMessage = await message.reply({ embeds: [embed, ...additionalEmbeds] });
-  setTimeout(() => {
-    replyMessage.delete().catch(() => {});
-  }, 1000 * 60 * 3);
+  setTimeout(
+    () => {
+      replyMessage.delete().catch(() => {});
+    },
+    1000 * 60 * 3,
+  );
 
   sendNewStickyMessage(message);
 };

@@ -1,6 +1,6 @@
+import client from '../../../client/index.js';
 import { COLORS } from '../../../constants/index.js';
 import Reminder from '../../../models/reminder.js';
-import client from '../../../client/index.js';
 import channelLog from '../../utils/channel-log.js';
 
 const REMINDER_EMOJI = '🔔';
@@ -42,7 +42,7 @@ export default async function createReminder(interaction) {
         endDate = new Date(`${endDateStr} 23:59:59`);
       }
 
-      if (isNaN(endDate.getTime())) {
+      if (Number.isNaN(endDate.getTime())) {
         throw new Error('Invalid date');
       }
     } catch (error) {
@@ -85,7 +85,8 @@ export default async function createReminder(interaction) {
           {
             color: COLORS.PRIMARY,
             title: 'Invalid Reminder Time',
-            description: `The reminder would be sent in the past. Try reducing days_before or setting a later end date.`,
+            description:
+              'The reminder would be sent in the past. Try reducing days_before or setting a later end date.',
           },
         ],
         ephemeral: true,
@@ -144,7 +145,7 @@ export default async function createReminder(interaction) {
             color: COLORS.PRIMARY,
             title: 'Reminder Set Up Successfully!',
             description:
-              `✅ Reminder created for the event\n\n` +
+              '✅ Reminder created for the event\n\n' +
               `📅 **End Date:** ${endDate.toLocaleString()}\n` +
               `⏰ **Reminder:** ${daysBefore} day(s) before (${reminderAt.toLocaleString()})\n` +
               `🔔 **Emoji:** ${REMINDER_EMOJI}\n\n` +
