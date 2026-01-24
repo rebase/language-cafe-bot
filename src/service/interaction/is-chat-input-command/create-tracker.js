@@ -167,9 +167,10 @@ export default async function createTracker(interaction) {
     }
 
     if (maxMisses !== null) {
+      const missUnit = frequency === 'weekly' ? 'weeks' : 'days';
       infoEmbed.fields.push({
         name: '❌ Max Misses',
-        value: maxMisses.toString(),
+        value: `${maxMisses} ${missUnit}`,
         inline: true,
       });
     }
