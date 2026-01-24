@@ -35,11 +35,12 @@ export default async function trackerCheckin(message) {
       return;
     }
 
-    // Parse command: !checkin done|break [--date YYYY-MM-DD]
-    const args = message.content.trim().split(/\s+/);
+    // Parse command: !checkin done|break [YYYY-MM-DD]
+    const content = message.content.trim();
+    const args = content.split(/\s+/);
 
     if (args.length < 2) {
-      await message.reply('❌ Usage: `!checkin done|break [--date YYYY-MM-DD]`');
+      await message.reply('❌ Usage: `!checkin done|break [YYYY-MM-DD]`');
       return;
     }
 
@@ -51,9 +52,18 @@ export default async function trackerCheckin(message) {
 
     // Parse optional date
     let targetDate = new Date();
-    if (args.length >= 4 && args[2] === '--date') {
+
+    if (args.length === 3) {
+      // Third argument should be a date in YYYY-MM-DD format
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+
+      if (!dateRegex.test(args[2])) {
+        await message.reply('❌ Invalid date format. Use YYYY-MM-DD');
+        return;
+      }
+
       try {
-        targetDate = new Date(args[3] + 'T00:00:00.000Z');
+        targetDate = new Date(args[2] + 'T00:00:00.000Z');
         if (isNaN(targetDate.getTime())) {
           throw new Error('Invalid date');
         }
@@ -61,6 +71,10 @@ export default async function trackerCheckin(message) {
         await message.reply('❌ Invalid date format. Use YYYY-MM-DD');
         return;
       }
+    } else if (args.length > 3) {
+      // Too many arguments
+      await message.reply('❌ Usage: `!checkin done|break [YYYY-MM-DD]`');
+      return;
     }
 
     // Validate date constraints
