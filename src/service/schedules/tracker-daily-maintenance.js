@@ -1,11 +1,11 @@
-import Tracker from '../../models/tracker.js';
-import TrackerParticipant from '../../models/tracker-participant.js';
-import TrackerCheckin from '../../models/tracker-checkin.js';
-import TrackerBan from '../../models/tracker-ban.js';
 import client from '../../client/index.js';
-import { getStartOfDay } from '../utils/tracker-utils.js';
-import { updateLiveTracker } from '../utils/tracker-renderer.js';
+import TrackerBan from '../../models/tracker-ban.js';
+import TrackerCheckin from '../../models/tracker-checkin.js';
+import TrackerParticipant from '../../models/tracker-participant.js';
+import Tracker from '../../models/tracker.js';
 import channelLog from '../utils/channel-log.js';
+import { updateLiveTracker } from '../utils/tracker-renderer.js';
+import { getStartOfDay } from '../utils/tracker-utils.js';
 
 /**
  * Daily maintenance for trackers:
@@ -101,10 +101,6 @@ async function checkParticipantForBan(tracker, participant, graceCutoff, today) 
         }
       }
     } else if (tracker.frequency === 'weekly') {
-      // For weekly trackers, count missed weeks using trackerWeek field
-      const trackerStart = getStartOfDay(tracker.startDate);
-      const trackerEnd = getStartOfDay(tracker.endDate);
-
       // Calculate total weeks in tracker period
       const totalWeeks = Math.ceil(
         (trackerEnd.getTime() - trackerStart.getTime()) / (1000 * 60 * 60 * 24 * 7),
