@@ -160,7 +160,7 @@ export default async function createTracker(interaction) {
 
     if (maxBreaksPerWeek !== null) {
       infoEmbed.fields.push({
-        name: '☕ Max Breaks/Week',
+        name: '🟨 Max Breaks/Week',
         value: maxBreaksPerWeek.toString(),
         inline: true,
       });

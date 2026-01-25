@@ -76,7 +76,7 @@ async function generateWeeklyTrackerEmbed(tracker) {
 
       if (weekNum < joinWeek) {
         // Week before user joined
-        cellEmoji = CELL_EMOJIS.MISSING;
+        cellEmoji = CELL_EMOJIS.BEFORE_JOIN;
       } else if (checkin) {
         // User has a check-in for this week
         cellEmoji = CELL_EMOJIS.DONE;
@@ -114,7 +114,7 @@ async function generateWeeklyTrackerEmbed(tracker) {
     title: `📊 ${tracker.displayName} - Live Tracker`,
     description: `\`\`\`\n${trackerText}\`\`\``,
     footer: {
-      text: `${CELL_EMOJIS.DONE} Completed • ${CELL_EMOJIS.MISSING} Not Yet • ${CELL_EMOJIS.FINAL_MISS} Missed Week`,
+      text: `${CELL_EMOJIS.DONE} Completed • ${CELL_EMOJIS.MISSING} Not Yet • ${CELL_EMOJIS.FINAL_MISS} Missed Week • ${CELL_EMOJIS.BEFORE_JOIN} Before Join`,
     },
     timestamp: new Date().toISOString(),
   };
@@ -199,11 +199,18 @@ async function generateDailyTrackerEmbed(tracker) {
         // User has a check-in for this date
         cellEmoji = checkin.type === 'done' ? CELL_EMOJIS.DONE : CELL_EMOJIS.BREAK;
       } else {
-        // No check-in - determine if it should be ❌ or ⬜
+        // No check-in - determine the appropriate state
         const joinDate = getStartOfDay(participant.joinedAt);
 
-        // Only show cells for dates within tracker period and after user joined
-        if (date >= Math.max(joinDate, trackerStart) && date <= trackerEnd && date <= today) {
+        if (date < joinDate) {
+          // Date is before user joined - use radio button
+          cellEmoji = CELL_EMOJIS.BEFORE_JOIN;
+        } else if (
+          date >= Math.max(joinDate, trackerStart) &&
+          date <= trackerEnd &&
+          date <= today
+        ) {
+          // Date is after user joined and within valid range
           // Check if grace period has expired
           const daysSinceDate = Math.floor(
             (today.getTime() - date.getTime()) / (1000 * 60 * 60 * 24),
@@ -212,11 +219,11 @@ async function generateDailyTrackerEmbed(tracker) {
           if (daysSinceDate > tracker.gracePeriodDays) {
             cellEmoji = CELL_EMOJIS.FINAL_MISS; // Grace period expired
           } else {
-            cellEmoji = CELL_EMOJIS.MISSING; // Still within grace period
+            cellEmoji = CELL_EMOJIS.MISSING; // Still within grace period - can still check in
           }
         } else {
-          // Date is before join, before tracker start, after tracker end, or in future
-          cellEmoji = CELL_EMOJIS.MISSING;
+          // Date is before tracker start, after tracker end, or in future
+          cellEmoji = CELL_EMOJIS.BEFORE_JOIN;
         }
       }
 
@@ -241,7 +248,7 @@ async function generateDailyTrackerEmbed(tracker) {
     title: `📊 ${tracker.displayName} - Live Tracker`,
     description: `\`\`\`\n${trackerText}\`\`\``,
     footer: {
-      text: `${CELL_EMOJIS.DONE} Done • ${CELL_EMOJIS.BREAK} Break • ${CELL_EMOJIS.MISSING} Missing • ${CELL_EMOJIS.FINAL_MISS} Final Miss`,
+      text: `${CELL_EMOJIS.DONE} Done • ${CELL_EMOJIS.BREAK} Break • ${CELL_EMOJIS.MISSING} Missing • ${CELL_EMOJIS.FINAL_MISS} Final Miss • ${CELL_EMOJIS.BEFORE_JOIN} Before Join`,
     },
     timestamp: new Date().toISOString(),
   };
