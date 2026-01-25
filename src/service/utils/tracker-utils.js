@@ -9,7 +9,8 @@ export const CELL_EMOJIS = {
   MISSING: '⬜',
   FINAL_MISS: '❌',
   DONE: '✅',
-  BREAK: '☕',
+  BREAK: '🟨',
+  BEFORE_JOIN: '🔘',
 };
 
 /**
