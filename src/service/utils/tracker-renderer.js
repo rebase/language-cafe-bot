@@ -112,7 +112,7 @@ async function generateWeeklyTrackerEmbed(tracker) {
   return {
     color: 0x5865f2,
     title: `📊 ${tracker.displayName} - Live Tracker`,
-    description: `\`\`\`\n${trackerText}\`\`\``,
+    description: `Please keep in mind that this bot is set to GMT/UTC so each day starts at <t:946684800:t> your time\n\n\`\`\`\n${trackerText}\`\`\``,
     footer: {
       text: `${CELL_EMOJIS.DONE} Completed • ${CELL_EMOJIS.MISSING} Not Yet • ${CELL_EMOJIS.FINAL_MISS} Missed Week • ${CELL_EMOJIS.BEFORE_JOIN} Before Join`,
     },
@@ -246,7 +246,7 @@ async function generateDailyTrackerEmbed(tracker) {
   return {
     color: 0x5865f2,
     title: `📊 ${tracker.displayName} - Live Tracker`,
-    description: `\`\`\`\n${trackerText}\`\`\``,
+    description: `Please keep in mind that this bot is set to GMT/UTC so each day starts at <t:946684800:t> your time\n\n\`\`\`\n${trackerText}\`\`\``,
     footer: {
       text: `${CELL_EMOJIS.DONE} Done • ${CELL_EMOJIS.BREAK} Break • ${CELL_EMOJIS.MISSING} Missing • ${CELL_EMOJIS.FINAL_MISS} Final Miss • ${CELL_EMOJIS.BEFORE_JOIN} Before Join`,
     },
