@@ -10,10 +10,25 @@ import registerMyStudyBuddyListing from '../service/interaction/is-modal-submit/
 import channelLog, { generateInteractionCreateLogContent } from '../service/utils/channel-log.js';
 import createANewMatchMatchTopic from '../service/interaction/is-modal-submit/create-a-new-match-match-topic.js';
 import participateMatchMatch from '../service/interaction/is-modal-submit/participate-match-match.js';
+import trackerJoinEmojiAutocomplete from '../service/interaction/is-autocomplete/tracker-join-emoji-autocomplete.js';
 
 export default {
   name: Events.InteractionCreate,
   async execute(interaction) {
+    if (interaction.isAutocomplete()) {
+      channelLog(
+        generateInteractionCreateLogContent(
+          interaction,
+          `commandName: ${interaction.commandName}\ninteraction.isAutocomplete() is true`,
+        ),
+      );
+
+      if (interaction.commandName === 'tracker-join') {
+        trackerJoinEmojiAutocomplete(interaction);
+        return;
+      }
+    }
+
     if (interaction.isChatInputCommand()) {
       const cooldownRes = await cooldown(interaction);
       if (cooldownRes?.shouldReturn) return;

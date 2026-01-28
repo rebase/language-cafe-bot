@@ -1,9 +1,3 @@
-import emojis from '../../data/emojis.js';
-
-// Available emojis for tracker participants - imported from existing emoji data
-// Users can select any emoji from this list when joining a tracker
-export const TRACKER_EMOJIS = emojis;
-
 // Cell state emojis
 export const CELL_EMOJIS = {
   MISSING: '⬜',

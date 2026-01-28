@@ -10,8 +10,9 @@ const data = new SlashCommandBuilder()
   .addStringOption((option) =>
     option
       .setName('emoji')
-      .setDescription('Your emoji for the tracker (e.g., 🐶, 🎨, 🚀)')
-      .setRequired(true),
+      .setDescription('Choose your emoji for this tracker')
+      .setRequired(true)
+      .setAutocomplete(true),
   );
 
 export default {

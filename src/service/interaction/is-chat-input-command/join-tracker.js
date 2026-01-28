@@ -2,12 +2,13 @@ import { COLORS } from '../../../constants/index.js';
 import Tracker from '../../../models/tracker.js';
 import TrackerParticipant from '../../../models/tracker-participant.js';
 import TrackerBan from '../../../models/tracker-ban.js';
-import { isForumThread, TRACKER_EMOJIS } from '../../utils/tracker-utils.js';
+import { isForumThread } from '../../utils/tracker-utils.js';
 import { updateLiveTracker } from '../../utils/tracker-renderer.js';
 import channelLog from '../../utils/channel-log.js';
+import EMOJI_KEYWORDS from '../../../data/emoji-keywords.js';
 
 export default async function joinTracker(interaction) {
-  await interaction.deferReply();
+  await interaction.deferReply({ ephemeral: true });
 
   try {
     // Validate this is a thread
@@ -20,30 +21,13 @@ export default async function joinTracker(interaction) {
             description: 'You can only join trackers in threads.',
           },
         ],
-        ephemeral: true,
       });
       return;
     }
 
     const threadId = interaction.channel.id;
     const userId = interaction.user.id;
-    const emoji = interaction.options.getString('emoji');
-
-    // Validate emoji is in allowed list
-    if (!TRACKER_EMOJIS.includes(emoji)) {
-      await interaction.editReply({
-        embeds: [
-          {
-            color: COLORS.PRIMARY,
-            title: 'Invalid Emoji',
-            description:
-              'Invalid emoji selected. Please select from basic Discord emojis only (e.g., 🐶, 🎨, 🚀, 💡).',
-          },
-        ],
-        ephemeral: true,
-      });
-      return;
-    }
+    const selectedEmoji = interaction.options.getString('emoji');
 
     // Find the tracker
     const tracker = await Tracker.findOne({ threadId, isActive: true });
@@ -56,7 +40,6 @@ export default async function joinTracker(interaction) {
             description: 'There is no active tracker in this thread.',
           },
         ],
-        ephemeral: true,
       });
       return;
     }
@@ -72,7 +55,6 @@ export default async function joinTracker(interaction) {
             description: `You are already participating in this tracker as ${existingParticipant.emoji}`,
           },
         ],
-        ephemeral: true,
       });
       return;
     }
@@ -89,7 +71,6 @@ export default async function joinTracker(interaction) {
               'You are banned from this tracker due to exceeding the maximum number of misses.',
           },
         ],
-        ephemeral: true,
       });
       return;
     }
@@ -105,23 +86,39 @@ export default async function joinTracker(interaction) {
             description: 'This tracker has reached the maximum of 25 participants.',
           },
         ],
-        ephemeral: true,
+      });
+      return;
+    }
+
+    // Validate the selected emoji is available (must be in emoji-keywords)
+    const availableEmojis = Object.keys(EMOJI_KEYWORDS);
+    if (!availableEmojis.includes(selectedEmoji)) {
+      await interaction.editReply({
+        embeds: [
+          {
+            color: COLORS.PRIMARY,
+            title: 'Invalid Emoji',
+            description: 'The selected emoji is not available for trackers.',
+          },
+        ],
       });
       return;
     }
 
     // Check if emoji is already in use
-    const emojiInUse = await TrackerParticipant.findOne({ trackerId: threadId, emoji });
+    const emojiInUse = await TrackerParticipant.findOne({
+      trackerId: threadId,
+      emoji: selectedEmoji,
+    });
     if (emojiInUse) {
       await interaction.editReply({
         embeds: [
           {
             color: COLORS.PRIMARY,
-            title: 'Emoji Already In Use',
-            description: `The emoji ${emoji} is already being used by another participant. Please choose a different emoji.`,
+            title: 'Emoji Already Taken',
+            description: `The emoji ${selectedEmoji} is already in use by another participant. Please choose a different emoji.`,
           },
         ],
-        ephemeral: true,
       });
       return;
     }
@@ -130,7 +127,7 @@ export default async function joinTracker(interaction) {
     const participant = new TrackerParticipant({
       trackerId: threadId,
       userId,
-      emoji,
+      emoji: selectedEmoji,
       joinedAt: new Date(),
     });
 
@@ -140,13 +137,13 @@ export default async function joinTracker(interaction) {
       embeds: [
         {
           color: COLORS.PRIMARY,
-          title: 'Joined Tracker!',
-          description: `<@${userId}> has joined this tracker as ${emoji}`,
+          title: 'Successfully Joined Tracker!',
+          description: `<@${userId}> has joined the **${tracker.displayName}** tracker as ${selectedEmoji}`,
         },
       ],
     });
 
-    channelLog(`User joined tracker: ${userId} | ${threadId} | ${emoji}`);
+    channelLog(`User joined tracker: ${userId} | ${threadId} | ${selectedEmoji}`);
 
     // Update live tracker
     await updateLiveTracker(threadId, interaction.channel);
@@ -160,7 +157,6 @@ export default async function joinTracker(interaction) {
           description: 'An error occurred while joining the tracker. Please try again.',
         },
       ],
-      ephemeral: true,
     });
   }
 }
