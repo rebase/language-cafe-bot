@@ -9,6 +9,34 @@ import {
 } from './tracker-utils.js';
 
 /**
+ * Generate participants embed for a tracker
+ */
+async function generateParticipantsEmbed(tracker) {
+  const participants = await TrackerParticipant.find({ trackerId: tracker.threadId }).sort({
+    joinedAt: 1,
+  });
+
+  if (participants.length === 0) {
+    return {
+      color: 0x5865f2,
+      title: '👥 Participants',
+      description: 'No participants yet.',
+    };
+  }
+
+  let participantsList = '';
+  for (const participant of participants) {
+    participantsList += `${participant.emoji} <@${participant.userId}>\n`;
+  }
+
+  return {
+    color: 0x5865f2,
+    title: '👥 Participants',
+    description: participantsList,
+  };
+}
+
+/**
  * Generate the live tracker embed for weekly trackers
  * Shows weeks with completion status instead of daily check-ins
  */
@@ -265,6 +293,7 @@ export async function updateLiveTracker(trackerId, channel) {
     }
 
     const embed = await generateLiveTrackerEmbed(trackerId);
+    const participantsEmbed = await generateParticipantsEmbed(tracker);
     if (!embed) {
       return;
     }
@@ -273,7 +302,7 @@ export async function updateLiveTracker(trackerId, channel) {
       // Try to edit existing message
       try {
         const existingMessage = await channel.messages.fetch(tracker.liveTrackerMessageId);
-        await existingMessage.edit({ embeds: [embed] });
+        await existingMessage.edit({ embeds: [embed, participantsEmbed] });
         return;
       } catch (error) {
         // Message not found, create new one
@@ -281,7 +310,7 @@ export async function updateLiveTracker(trackerId, channel) {
     }
 
     // Create new live tracker message
-    const message = await channel.send({ embeds: [embed] });
+    const message = await channel.send({ embeds: [embed, participantsEmbed] });
     await message.pin();
 
     // Update tracker with new message ID
