@@ -93,10 +93,12 @@ export default {
 
   // Nature & Plants
   '🌹': ['rose', 'flower', 'red', 'love', 'romantic'],
+  '🌸': ['cherry', 'blossom', 'flower', 'pink', 'spring', 'japan', 'sakura'],
   '🌻': ['sunflower', 'yellow', 'flower', 'sun', 'bright'],
   '🌱': ['seedling', 'plant', 'grow', 'green', 'sprout'],
   '🌲': ['tree', 'evergreen', 'pine', 'forest', 'christmas'],
   '🌵': ['cactus', 'desert', 'spikes', 'green', 'prickly'],
+  '🍀': ['four', 'leaf', 'clover', 'lucky', 'green', 'ireland', 'fortune'],
   '🍁': ['leaf', 'autumn', 'fall', 'maple', 'orange'],
   '🍄': ['mushroom', 'fungi', 'red', 'white', 'spots'],
 
@@ -150,6 +152,7 @@ export default {
   '🍪': ['cookie', 'sweet', 'dessert', 'chocolate', 'chip'],
   '🍰': ['cake', 'birthday', 'dessert', 'sweet', 'slice'],
   '🍫': ['chocolate', 'sweet', 'brown', 'candy', 'bar'],
+  '🍬': ['candy', 'sweet', 'wrapped', 'sugar', 'treat'],
   '🍭': ['lollipop', 'candy', 'sweet', 'stick', 'colorful'],
   '🍯': ['honey', 'sweet', 'bee', 'golden', 'sticky'],
   '🍺': ['beer', 'alcohol', 'drink', 'foam', 'mug'],
@@ -218,6 +221,7 @@ export default {
   '🔥': ['fire', 'hot', 'flame', 'burn', 'heat'],
   '💧': ['water', 'drop', 'blue', 'wet', 'liquid'],
   '🌊': ['wave', 'ocean', 'water', 'sea', 'surf'],
+  '❄️': ['snowflake', 'snow'],
 
   // Clothing & Accessories
   '👓': ['glasses', 'eyeglasses', 'vision', 'nerd', 'smart'],
