@@ -8,7 +8,7 @@ import channelLog from '../../utils/channel-log.js';
 import EMOJI_KEYWORDS from '../../../data/emoji-keywords.js';
 
 export default async function joinTracker(interaction) {
-  await interaction.deferReply({ ephemeral: true });
+  await interaction.deferReply({ ephemeral: false });
 
   try {
     // Validate this is a thread

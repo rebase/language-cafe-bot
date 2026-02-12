@@ -5,6 +5,7 @@ import initializePoint from '../service/schedules/initialize-point.js';
 import checkAndSendReminders from '../service/schedules/check-and-send-reminders.js';
 import trackerDailyMaintenance from '../service/schedules/tracker-daily-maintenance.js';
 import trackerWeeklySnapshots from '../service/schedules/tracker-weekly-snapshots.js';
+import trackerDailyReminders from '../service/schedules/tracker-daily-reminders.js';
 
 export default function schedules() {
   // every 10 seconds
@@ -22,6 +23,7 @@ export default function schedules() {
   schedule.scheduleJob('0 0 * * *', () => {
     sendANewMatchMatchMessage();
     trackerDailyMaintenance();
+    trackerDailyReminders();
   });
 
   // every Sunday at 01:00 (weekly snapshots)
