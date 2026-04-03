@@ -19,6 +19,20 @@ export default async (interaction) => {
   const offeredLanguage = interaction.fields.getTextInputValue('offeredLanguage');
   const introduction = interaction.fields.getTextInputValue('introduction');
 
+  if (introduction.length < 20) {
+    await interaction.reply({
+      embeds: [
+        {
+          color: COLORS.PRIMARY,
+          title: 'Register Language Exchange Partner Listing',
+          description: 'Please enter at least 20 characters for your introduction.',
+        },
+      ],
+      ephemeral: true,
+    });
+    return;
+  }
+
   // check if targetLanguage is invalid
   const targetLanguageArray = targetLanguage
     .split(',')

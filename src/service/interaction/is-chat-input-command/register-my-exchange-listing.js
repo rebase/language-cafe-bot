@@ -3,9 +3,7 @@ import ExchangePartner from '../../../models/ExchangePartner.js';
 
 export default async (interaction) => {
   const exchangePartner = await ExchangePartner.findOne({
-    where: {
-      id: interaction.member.user.id,
-    },
+    id: interaction.member.user.id,
   });
 
   const modal = new ModalBuilder()
@@ -34,9 +32,13 @@ export default async (interaction) => {
     .setPlaceholder(
       'About you, Partner (traits), Time (hours/week), Communication method (voice calls, texting, etc.)',
     )
-    .setValue(exchangePartner?.introduction || '')
     .setStyle(TextInputStyle.Paragraph)
+    .setMinLength(20)
     .setMaxLength(1000);
+
+  if (exchangePartner?.introduction) {
+    introduction.setValue(exchangePartner?.introduction);
+  }
 
   modal.addComponents(
     new ActionRowBuilder().addComponents(targetLanguage),

@@ -19,6 +19,20 @@ export default async (interaction) => {
   const level = interaction.fields.getTextInputValue('level');
   const introduction = interaction.fields.getTextInputValue('introduction');
 
+  if (introduction.length < 20) {
+    await interaction.reply({
+      embeds: [
+        {
+          color: COLORS.PRIMARY,
+          title: 'Register Study Buddy Listing',
+          description: 'Please enter at least 20 characters for your introduction.',
+        },
+      ],
+      ephemeral: true,
+    });
+    return;
+  }
+
   const targetLanguageArray = targetLanguage
     .split(',')
     .map((language) => language.trim())

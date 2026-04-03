@@ -32,9 +32,13 @@ export default async (interaction) => {
     .setPlaceholder(
       'About you, Study Buddy, Time (hours/week), Communication method (voice calls, texting, etc.)',
     )
-    .setValue(studyBuddy?.introduction || '')
     .setStyle(TextInputStyle.Paragraph)
+    .setMinLength(20)
     .setMaxLength(1000);
+
+  if (studyBuddy?.introduction) {
+    introduction.setValue(studyBuddy?.introduction);
+  }
 
   modal.addComponents(
     new ActionRowBuilder().addComponents(targetLanguage),
