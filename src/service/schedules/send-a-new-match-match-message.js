@@ -9,10 +9,12 @@ import Point from '../../models/point.js';
 const { MATCH_MATCH_CHANNEL_ID: matchMatchChannelId, MATCH_MATCH_COMMAND_ID: matchMatchCommandId } =
   config;
 
+const normalize = (str) => str.toUpperCase().replace(/[ -]/g, '');
+
 const processMatchedSubmissions = (submissionsArr, matchMatchMessages) =>
   submissionsArr.map((submission) => {
     const matchedMessages = matchMatchMessages.filter(
-      (msg) => msg.submission.toUpperCase().replace(/ /g, '') === submission,
+      (msg) => normalize(msg.submission) === submission,
     );
     return { submission, items: matchedMessages };
   });
@@ -83,11 +85,9 @@ const sendANewMatchMatchMessage = async () => {
     const submissionWithCountObj = {};
 
     matchMatchMessages.forEach((matchMatchMessage) => {
-      const upperCaseWithoutSpaceSubmission = matchMatchMessage.submission
-        .toUpperCase()
-        .replace(/ /g, '');
-      submissionWithCountObj[upperCaseWithoutSpaceSubmission] =
-        submissionWithCountObj[upperCaseWithoutSpaceSubmission] + 1 || 1;
+      const normalizedSubmission = normalize(matchMatchMessage.submission);
+      submissionWithCountObj[normalizedSubmission] =
+        submissionWithCountObj[normalizedSubmission] + 1 || 1;
     });
 
     const [
@@ -126,13 +126,15 @@ const sendANewMatchMatchMessage = async () => {
       matchMatchMessages,
     );
 
-    const notMachedParticipants = matchMatchMessages.filter(
-      (msg) =>
-        !matchedTwoSubmissionArr.includes(msg.submission.toUpperCase().replace(/ /g, '')) &&
-        !matchedThreeSubmissionArr.includes(msg.submission.toUpperCase().replace(/ /g, '')) &&
-        !matchedFourSubmissionArr.includes(msg.submission.toUpperCase().replace(/ /g, '')) &&
-        !overMatchedSubmissionArr.includes(msg.submission.toUpperCase().replace(/ /g, '')),
-    );
+    const notMachedParticipants = matchMatchMessages.filter((msg) => {
+      const normalized = normalize(msg.submission);
+      return (
+        !matchedTwoSubmissionArr.includes(normalized) &&
+        !matchedThreeSubmissionArr.includes(normalized) &&
+        !matchedFourSubmissionArr.includes(normalized) &&
+        !overMatchedSubmissionArr.includes(normalized)
+      );
+    });
 
     const bulkWriteArr = [
       ...createBulkWriteOperations(matchedTwoDescriptionArr, 50),
