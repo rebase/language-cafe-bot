@@ -138,12 +138,12 @@ Enjoy your stay, and happy language learning!
       languageChannels.map((line, i) => `${i + 1}. ${line}`).join('\n')
     : `**Before I can show your language channels, you'll first need to finish the server onboarding in [Channels & Roles](${channelLink(GENERAL_CHANNELS.customize)}). Once you've finished, return here and press Refresh.**`;
   stepContent.interests += recreationalChannels.length
-    ? `If you'd like to chat about your interests beyond language learning, check out:\n${recreationalChannels
+    ? `If you're looking for activities and discussions beyond language learning, check out:\n${recreationalChannels
         .map((line, i) => `${i + 1}. ${line}`)
         .join('\n')}`
     : `If you add interest roles in "Other Roles" inside [Channels & Roles](${channelLink(GENERAL_CHANNELS.customize)}), relevant channels will appear here.`;
   stepContent.community += communityChannels.length
-    ? `You also selected roles for the following community channels:\n${communityChannels
+    ? `You also selected roles for the following community and language-related channels:\n${communityChannels
         .map((line, i) => `${i + 1}. ${line}`)
         .join('\n')}`
     : `You haven't selected any community roles. Select them in "Other Roles" inside [Channels & Roles](${channelLink(GENERAL_CHANNELS.customize)}) if you'd like.`;
@@ -169,7 +169,7 @@ Enjoy your stay, and happy language learning!
   for (let i = 0; i < tutorialStep + 1; i++) {
     const content = `Step ${i + 1} of ${numOfSteps}\n` + stepContent[stepOrder[i]];
     const stepEmbed = {
-      color: COLORS.DM_SERVER_TUTORIAL_EMBEDS,
+      color: COLORS.PRIMARY,
       description: content,
     };
     currentAllStepsEmbed.push(stepEmbed);

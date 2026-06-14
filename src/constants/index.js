@@ -1,6 +1,6 @@
+/* eslint-disable no-multi-spaces */
 export const COLORS = {
   PRIMARY: 0xc3c3e5,
-  DM_SERVER_TUTORIAL_EMBEDS: 0xd89ba8,
 };
 
 // Anyone can access these.
@@ -17,25 +17,36 @@ export const GENERAL_CHANNELS = {
   privateServerHelp: '815396406965698631',
 };
 
-// NOTE: If the names of the roles change, then all the role-based maps here
-// will break.
+// NOTE: If the names of the roles change, then the role-based maps here
+// will break for those roles.
 
+// Used in "Explore Your Interests"
 export const RECREATIONAL_CHANNELS = {
-  'Book Club': '904704521580707890',
-  Creatives: '739915357388669050',
-  Conlang: '785071174827638804',
-  Games: '739915551731744811',
-  Humanities: '937830159761948772',
-  Kitchen: '806955829680930878',
-  Linguistics: '739915518085169282',
-  'Language Jam': '1008597469661241345',
-  STEM: '815686754652520499',
-  Music: '739915454591795332',
-  Media: '937835736651157585',
-  Wellness: '815686807513464873',
+  'Book Club': '904704521580707890',     // Recreation Lounge  -> book-club
+  Creatives: '739915357388669050',       // Recreation Lounge  -> creative-corner
+  Games: '739915551731744811',           // Recreation Lounge  -> arcade
+  Humanities: '937830159761948772',      // Recreation Lounge  -> humanities-table
+  Kitchen: '806955829680930878',         // Recreation Lounge  -> kitchen
+  STEM: '815686754652520499',            // Recreation Lounge  -> stem-lab
+  Music: '739915454591795332',           // Recreation Lounge  -> jukebox
+  Media: '937835736651157585',           // Recreation Lounge  -> tv-and-media-room
+  Wellness: '815686807513464873',        // Recreation Lounge  -> wellness-table
+};
+
+// Used in "Community & Language Activities"
+export const COMMUNITY_CHANNELS = {
+  Promotions: '1411441347436613652',          // Information Station -> promotions
+  Announcements: '739914487724769380',        // Information Station -> cafe-announcements
+  'Server-Wide Events': '805738123853430805', // Server-wide Events  -> server-wide-events
+  Challenger: '1422215870444343337',          // Study Lounge        -> challenge-lounge
+  'Study Table': '739915489785937941',        // Study Lounge        -> study-table
+  'Language Jam': '1008597469661241345',      // Server-wide Events  -> language-jam
+  Conlang: '785071174827638804',              // Linguistics         -> conlang-table
+  Linguistics: '739915518085169282',          // Linguistics         -> linguistics-table
+
   // Specifically `Pass the Coffee Cup`. Users can probably figure out that
   // there are more word games available.
-  'Word Games': '1160816895633657856',
+  'Word Games': '1160816895633657856',        // Word Games          -> pass-the-coffee-cup
 };
 
 export const LANGUAGE_CHANNELS = {
@@ -86,12 +97,4 @@ export const LANGUAGE_CHANNELS = {
   Turkish: '1002711185965199501',
   Ukranian: '1019870489184841748',
   Vietnamese: '1279361929235791883',
-};
-
-export const COMMUNITY_CHANNELS = {
-  Challenger: '1422215870444343337',
-  'Server-Wide Events': '805738123853430805',
-  'Study Table': '739915489785937941',
-  Promotions: '1411441347436613652',
-  Announcements: '739914487724769380',
 };
