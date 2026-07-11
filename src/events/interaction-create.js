@@ -11,6 +11,7 @@ import channelLog, { generateInteractionCreateLogContent } from '../service/util
 import createANewMatchMatchTopic from '../service/interaction/is-modal-submit/create-a-new-match-match-topic.js';
 import participateMatchMatch from '../service/interaction/is-modal-submit/participate-match-match.js';
 import trackerJoinEmojiAutocomplete from '../service/interaction/is-autocomplete/tracker-join-emoji-autocomplete.js';
+import dmServerTutorial from '../service/interaction/is-button/dm-server-tutorial.js';
 
 export default {
   name: Events.InteractionCreate,
@@ -93,6 +94,11 @@ export default {
 
       if (interaction.customId.startsWith('join-pomodoro-group')) {
         joinPomodoroGroup(interaction);
+        return;
+      }
+
+      if (interaction.customId.startsWith('dm-server-tutorial')) {
+        dmServerTutorial(interaction);
         // eslint-disable-next-line no-useless-return
         return;
       }

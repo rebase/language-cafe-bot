@@ -9,6 +9,9 @@ const newMember = new Schema(
       required: true,
       unique: true,
     },
+    tutorialStep: {
+      type: Number,
+    },
   },
   {
     timestamps: true,
