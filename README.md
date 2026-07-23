@@ -52,6 +52,8 @@
 - `/etymology` - Get the etymology of a word
 - `/ipa` - Get the transcription of a word
 - `/generate-poll` - Generate a poll
+- `/today` - Display today's events from the event calendar
+- `/now` - Display events that are live right now
 - `/extract-new-members` - Extract new members (Administrator only)
 
 ## Interactive Message Games
