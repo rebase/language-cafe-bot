@@ -1,7 +1,7 @@
 import { REST, Routes } from 'discord.js';
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'url';
+import { fileURLToPath } from 'url';
 import config from './config/index.js';
 
 const { CLIENT_ID: cliendId, DISCORD_TOKEN: discordToken } = config;
@@ -27,7 +27,7 @@ const commandFolders = fs.readdirSync(foldersPath);
       console.info(filePath);
 
       // eslint-disable-next-line no-await-in-loop
-      const command = (await import(pathToFileURL(filePath).href)).default;
+      const command = (await import(filePath)).default;
 
       if ('data' in command && 'execute' in command) {
         commands.push(command.data.toJSON());
