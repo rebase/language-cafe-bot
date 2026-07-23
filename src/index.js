@@ -1,7 +1,7 @@
 import { Collection, userMention } from 'discord.js';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import client from './client/index.js';
 import config from './config/index.js';
 import mongoDBConnect from './lib/mongo-db.js';
@@ -27,7 +27,7 @@ for (const folder of commandFolders) {
     const filePath = path.join(commandsPath, file);
 
     (async () => {
-      const command = (await import(filePath)).default;
+      const command = (await import(pathToFileURL(filePath).href)).default;
 
       if ('data' in command && 'execute' in command) {
         client.commands.set(command.data.name, command);
@@ -49,7 +49,7 @@ for (const file of eventFiles) {
   const filePath = path.join(eventsPath, file);
 
   (async () => {
-    const event = (await import(filePath)).default;
+    const event = (await import(pathToFileURL(filePath).href)).default;
 
     if (event.once) {
       client.once(event.name, (...args) => event.execute(...args));
