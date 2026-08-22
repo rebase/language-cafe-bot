@@ -6,6 +6,8 @@ import checkAndSendReminders from '../service/schedules/check-and-send-reminders
 import trackerDailyMaintenance from '../service/schedules/tracker-daily-maintenance.js';
 import trackerWeeklySnapshots from '../service/schedules/tracker-weekly-snapshots.js';
 import trackerDailyReminders from '../service/schedules/tracker-daily-reminders.js';
+import eventLifecycle from '../service/schedules/event-lifecycle.js';
+import { refreshEventCalendar } from '../service/utils/event-calendar.js';
 
 export default function schedules() {
   // every 10 seconds
@@ -13,10 +15,15 @@ export default function schedules() {
 
   // });
 
+  // Run immediately on startup to catch any state changes while the bot was down
+  eventLifecycle();
+  refreshEventCalendar();
+
   // every hour
   schedule.scheduleJob('0 * * * *', () => {
     checkIfPassTheCoffeeCupLastMessageIsValid();
     checkAndSendReminders();
+    eventLifecycle();
   });
 
   // every day at 00:00
@@ -24,6 +31,8 @@ export default function schedules() {
     sendANewMatchMatchMessage();
     trackerDailyMaintenance();
     trackerDailyReminders();
+    // Refresh calendar daily so date headings stay current
+    refreshEventCalendar();
   });
 
   // every Sunday at 01:00 (weekly snapshots)

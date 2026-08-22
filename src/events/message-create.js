@@ -4,6 +4,7 @@ import suggestionBoxMessageCreate from '../service/messageCreate/suggestion-box.
 import passTheCoffeeCup from '../service/messageCreate/pass-the-coffee-cup.js';
 import passTheEmoji from '../service/messageCreate/emoji-blend.js';
 import trackerCheckin from '../service/messageCreate/tracker-checkin.js';
+import eventSubmission from '../service/messageCreate/event-submission.js';
 import config from '../config/index.js';
 import categories from '../service/messageCreate/categories.js';
 import counting from '../service/messageCreate/counting.js';
@@ -31,6 +32,9 @@ export default {
       trackerCheckin(message);
       return;
     }
+
+    // Event submission tracking (checks all messages for active event hashtags)
+    eventSubmission(message);
 
     // #study-check-in
     if (message.channel.id === studyCheckInChannelId) {

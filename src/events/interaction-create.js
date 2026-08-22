@@ -12,6 +12,10 @@ import createANewMatchMatchTopic from '../service/interaction/is-modal-submit/cr
 import participateMatchMatch from '../service/interaction/is-modal-submit/participate-match-match.js';
 import trackerJoinEmojiAutocomplete from '../service/interaction/is-autocomplete/tracker-join-emoji-autocomplete.js';
 import dmServerTutorial from '../service/interaction/is-button/dm-server-tutorial.js';
+import {
+  handleEventRemoveConfirm,
+  handleEventRemoveCancel,
+} from '../service/interaction/is-chat-input-command/event-remove.js';
 
 export default {
   name: Events.InteractionCreate,
@@ -26,6 +30,13 @@ export default {
 
       if (interaction.commandName === 'tracker-join') {
         trackerJoinEmojiAutocomplete(interaction);
+        return;
+      }
+
+      if (interaction.commandName === 'event') {
+        const { handleEventNameAutocomplete } =
+          await import('../service/interaction/is-autocomplete/event-name-autocomplete.js');
+        handleEventNameAutocomplete(interaction);
         return;
       }
     }
@@ -100,6 +111,16 @@ export default {
       if (interaction.customId.startsWith('dm-server-tutorial')) {
         dmServerTutorial(interaction);
         // eslint-disable-next-line no-useless-return
+        return;
+      }
+
+      if (interaction.customId.startsWith('event-remove-confirm:')) {
+        handleEventRemoveConfirm(interaction);
+        return;
+      }
+
+      if (interaction.customId.startsWith('event-remove-cancel:')) {
+        handleEventRemoveCancel(interaction);
         return;
       }
     }
