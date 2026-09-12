@@ -16,6 +16,13 @@ const matchMatchMessage = new Schema(
       type: String,
       required: true,
     },
+    // Which topic this submission was made for. Without it a round can score
+    // words that were submitted against a different topic.
+    topicId: {
+      type: Schema.Types.ObjectId,
+      ref: 'match_match_topic',
+      index: true,
+    },
   },
   {
     timestamps: true,

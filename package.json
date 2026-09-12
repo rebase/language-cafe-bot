@@ -5,6 +5,7 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
+    "test": "node test/match-match-text.test.js && node --experimental-test-module-mocks --no-warnings test/match-match-round.test.js",
     "dev": "nodemon .",
     "start": "NODE_ENV=production node .",
     "deploy-commands:dev": "node src/deploy-commands.js",

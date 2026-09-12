@@ -1,7 +1,7 @@
 import config from '../../../config/index.js';
 import { COLORS } from '../../../constants/index.js';
 import MatchMatchMessage from '../../../models/match-match-message.js';
-import MatchMatchTopic from '../../../models/match-match-topic.js';
+import getCurrentMatchMatchTopic from '../../utils/match-match-topic.js';
 
 const { CLIENT_ID: clientId, MATCH_MATCH_COMMAND_ID: matchMatchCommandId } = config;
 
@@ -9,7 +9,7 @@ export default async (interaction) => {
   try {
     await interaction.deferReply({ ephemeral: true });
 
-    const currentMatchMatchTopic = await MatchMatchTopic.findOne().sort({ createdAt: 1 });
+    const currentMatchMatchTopic = await getCurrentMatchMatchTopic();
 
     if (!currentMatchMatchTopic) {
       await interaction.editReply({
@@ -29,17 +29,14 @@ export default async (interaction) => {
     );
     const submission = interaction.fields.getTextInputValue('submission');
 
-    const isCompound = submission
-      .toUpperCase()
-      .includes(currentMatchMatchTopic.topic.toUpperCase());
-
-    if (!isCompound) {
+    // A compound word is a valid answer on any topic, so the submission is not
+    // required to contain the topic word. Only emptiness is rejected.
+    if (submission.trim().length === 0) {
       await interaction.editReply({
         embeds: [
           {
             color: COLORS.PRIMARY,
-            description:
-              '**Submission has to be a compound word in English.**\n\nSubmission must include the topic word of the day and be a compound word (ex. topic word is water. submissions include: waterfall, saltwater, water bottle, etc)',
+            description: '**Submission cannot be empty.**',
           },
         ],
       });
@@ -53,6 +50,7 @@ export default async (interaction) => {
       {
         submissionInTargetLanguage,
         submission,
+        topicId: currentMatchMatchTopic._id,
       },
       {
         upsert: true,
@@ -112,7 +110,9 @@ export default async (interaction) => {
       stickyMessages.map((stickyMessage) => stickyMessage.delete().catch(() => {})),
     );
 
-    const numberOfSubmissions = await MatchMatchMessage.countDocuments();
+    const numberOfSubmissions = await MatchMatchMessage.countDocuments({
+      topicId: currentMatchMatchTopic._id,
+    });
 
     await interaction.channel.send({
       embeds: [
