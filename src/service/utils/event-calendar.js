@@ -77,31 +77,34 @@ export async function refreshEventCalendar() {
     const channel = await client.channels.fetch(calendarChannelId).catch(() => null);
     if (!channel) return;
 
-    // Delete existing bot messages
+    // Delete existing bot messages — individual deletes to avoid bulkDelete's 14-day limit
     const messages = await channel.messages.fetch({ limit: 100 });
     const botMessages = messages.filter((m) => m.author.id === client.user.id);
-
-    if (botMessages.size > 0) {
-      try {
-        await channel.bulkDelete(botMessages);
-      } catch {
-        for (const msg of botMessages.values()) {
-          await msg.delete().catch(() => {});
-        }
-      }
+    for (const msg of botMessages.values()) {
+      await msg
+        .delete()
+        .catch((err) =>
+          console.error(`refreshEventCalendar: failed to delete message ${msg.id}:`, err.message),
+        );
     }
 
-    // Fetch active standard events
-    const events = await Event.find({ status: 'active' }).sort({ startDate: 1 });
+    // Fetch active standard events sorted alphabetically
+    const events = await Event.find({ status: 'active' }).sort({ name: 1 });
 
     // Only include live-event series with an occurrence scheduled for today.
-    const todayStr = formatDateUTC(new Date());
-    const liveEvents = (await LiveEvent.find({ status: { $in: ['upcoming', 'live'] } }))
-      .map((liveEvent) => ({
-        liveEvent,
-        occurrences: getOccurrencesOnDate(liveEvent, todayStr),
-      }))
-      .filter(({ occurrences }) => occurrences.length > 0);
+    // Wrapped separately so a live-event failure never blocks the standard embed.
+    let liveEvents = [];
+    try {
+      const todayStr = formatDateUTC(new Date());
+      liveEvents = (await LiveEvent.find({ status: { $in: ['upcoming', 'live'] } }))
+        .map((liveEvent) => ({
+          liveEvent,
+          occurrences: getOccurrencesOnDate(liveEvent, todayStr),
+        }))
+        .filter(({ occurrences }) => occurrences.length > 0);
+    } catch (liveErr) {
+      console.error('refreshEventCalendar: failed to fetch live events:', liveErr.message);
+    }
 
     await channel.send({
       embeds: [buildStandardEmbed(events, liveEvents)],

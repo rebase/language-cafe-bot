@@ -71,10 +71,10 @@ export function buildCalendarEmbed(event) {
 
 // ─── Live leaderboard embed builder ─────────────────────────────────────────
 
-const MEDALS = ['🥇', '🥈', '🥉'];
+const MEDALS = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟'];
 
 /**
- * Build the pinned leaderboard embed showing top 3 participants.
+ * Build the pinned leaderboard embed showing top 10 participants.
  * Sorted by points descending, then by earliest submission (createdAt ascending)
  * to break ties in favour of whoever reached that score first.
  */
@@ -85,9 +85,9 @@ export async function buildLiveLeaderboardEmbed(event) {
 
   const totalParticipants = await EventParticipant.countDocuments({ eventId });
 
-  const top3 = await EventParticipant.find({ eventId })
+  const top10 = await EventParticipant.find({ eventId })
     .sort({ points: -1, createdAt: 1 })
-    .limit(3)
+    .limit(10)
     .lean();
 
   const subtitle = event.pointsPerSubmission
@@ -95,10 +95,10 @@ export async function buildLiveLeaderboardEmbed(event) {
     : `Leaderboard · ${totalParticipants} participant${totalParticipants === 1 ? '' : 's'}`;
 
   let description;
-  if (top3.length === 0) {
+  if (top10.length === 0) {
     description = '*No submissions yet. Be the first!*';
   } else {
-    const rows = top3.map((p, i) =>
+    const rows = top10.map((p, i) =>
       event.pointsPerSubmission
         ? `${MEDALS[i]} <@${p.userId}> **${p.points}**`
         : `${MEDALS[i]} <@${p.userId}> ${p.submissionCount} submission${p.submissionCount === 1 ? '' : 's'}`,
@@ -137,13 +137,13 @@ export async function updateLiveLeaderboard(event) {
     const embed = await buildLiveLeaderboardEmbed(event);
     await message.edit({ embeds: [embed] });
 
-    // Lock once 3 participants have reached the max points cap
+    // Lock once 10 participants have reached the max points cap
     const maxedCount = await EventParticipant.countDocuments({
       eventId,
       points: event.maxPoints,
     });
 
-    if (maxedCount >= 3) {
+    if (maxedCount >= 10) {
       record.isLocked = true;
       await record.save();
     }
@@ -177,10 +177,7 @@ export function escapeRegex(value) {
 }
 
 export async function findByIdOrName(Model, selection) {
-  const normalizedSelection = selection.replace(
-    /\s+\[(?:Recurring|One-time)\s+·\s+[^\]]+\]$/,
-    '',
-  );
+  const normalizedSelection = selection.replace(/\s+\[(?:Recurring|One-time)\s+·\s+[^\]]+\]$/, '');
 
   if (mongoose.isValidObjectId(normalizedSelection)) {
     const byId = await Model.findById(normalizedSelection);
