@@ -47,6 +47,11 @@
 - `/get-study-buddy-listings` - Get study buddy listings
 - `/delete-my-study-buddy-listing` - Delete study-buddy listing
 
+### Events
+
+- `/today` - Post today's compact event calendar to `#event-calendar`
+- `/calendar` - Show upcoming and active events (detailed view)
+
 ### Utility
 
 - `/etymology` - Get the etymology of a word

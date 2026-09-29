@@ -21,6 +21,25 @@ const LEGEND =
 
 // ─── Standard events embed ────────────────────────────────────────────────────
 
+export async function fetchTodayCalendarData() {
+  const events = await Event.find({ status: 'active' }).sort({ name: 1 });
+
+  let liveEvents = [];
+  try {
+    const todayStr = formatDateUTC(new Date());
+    liveEvents = (await LiveEvent.find({ status: { $in: ['upcoming', 'live'] } }))
+      .map((liveEvent) => ({
+        liveEvent,
+        occurrences: getOccurrencesOnDate(liveEvent, todayStr),
+      }))
+      .filter(({ occurrences }) => occurrences.length > 0);
+  } catch (liveErr) {
+    console.error('fetchTodayCalendarData: failed to fetch live events:', liveErr.message);
+  }
+
+  return { events, liveEvents };
+}
+
 function buildStandardEmbed(events, liveEvents) {
   const today = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
@@ -72,10 +91,14 @@ function buildStandardEmbed(events, liveEvents) {
 
 export async function refreshEventCalendar() {
   try {
-    if (!calendarChannelId) return;
+    if (!calendarChannelId) {
+      return { ok: false, reason: 'missing_config' };
+    }
 
     const channel = await client.channels.fetch(calendarChannelId).catch(() => null);
-    if (!channel) return;
+    if (!channel) {
+      return { ok: false, reason: 'channel_not_found' };
+    }
 
     // Delete existing bot messages — individual deletes to avoid bulkDelete's 14-day limit
     const messages = await channel.messages.fetch({ limit: 100 });
@@ -88,23 +111,7 @@ export async function refreshEventCalendar() {
         );
     }
 
-    // Fetch active standard events sorted alphabetically
-    const events = await Event.find({ status: 'active' }).sort({ name: 1 });
-
-    // Only include live-event series with an occurrence scheduled for today.
-    // Wrapped separately so a live-event failure never blocks the standard embed.
-    let liveEvents = [];
-    try {
-      const todayStr = formatDateUTC(new Date());
-      liveEvents = (await LiveEvent.find({ status: { $in: ['upcoming', 'live'] } }))
-        .map((liveEvent) => ({
-          liveEvent,
-          occurrences: getOccurrencesOnDate(liveEvent, todayStr),
-        }))
-        .filter(({ occurrences }) => occurrences.length > 0);
-    } catch (liveErr) {
-      console.error('refreshEventCalendar: failed to fetch live events:', liveErr.message);
-    }
+    const { events, liveEvents } = await fetchTodayCalendarData();
 
     await channel.send({
       embeds: [buildStandardEmbed(events, liveEvents)],
@@ -116,7 +123,15 @@ export async function refreshEventCalendar() {
         liveEvents: `\`${liveEvents.length}\``,
       }),
     );
+
+    return {
+      ok: true,
+      channelId: calendarChannelId,
+      activeEvents: events.length,
+      liveEvents: liveEvents.length,
+    };
   } catch (err) {
     console.error('refreshEventCalendar error:', err);
+    return { ok: false, reason: 'error' };
   }
 }
