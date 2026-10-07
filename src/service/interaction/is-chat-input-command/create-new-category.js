@@ -3,12 +3,11 @@ import { ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from
 export default async (interaction) => {
   const modal = new ModalBuilder()
     .setCustomId('create-new-category')
-    .setTitle('Create new category (categories)');
+    .setTitle('Create new category');
 
   const message = new TextInputBuilder()
     .setCustomId('message')
-    .setLabel('Categories to create, one per line')
-    .setPlaceholder('Types of fruit\nThings found in a kitchen\nCity names')
+    .setLabel('Put message content')
     .setStyle(TextInputStyle.Paragraph);
 
   modal.addComponents(new ActionRowBuilder().addComponents(message));
