@@ -1,13 +1,12 @@
 import { Collection, Events, userMention } from 'discord.js';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import client from './client/index.js';
 import config from './config/index.js';
 import mongoDBConnect from './lib/mongo-db.js';
-import PomodoroGroup from './models/pomodoro-group.js';
 import schedules from './schedules/index.js';
-import { putPomodoroScheduleJob } from './service/interaction/is-chat-input-command/create-pomodoro-group.js';
+import pomodoro from './service/utils/pomodoro.js';
 import { channelLogWithoutEmbeds } from './service/utils/channel-log.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -32,7 +31,7 @@ for (const folder of commandFolders) {
     loadPromises.push(
       (async () => {
         try {
-          const command = (await import(filePath)).default;
+          const command = (await import(pathToFileURL(filePath).href)).default;
 
           if ('data' in command && 'execute' in command) {
             client.commands.set(command.data.name, command);
@@ -61,7 +60,7 @@ for (const file of eventFiles) {
   loadPromises.push(
     (async () => {
       try {
-        const event = (await import(filePath)).default;
+        const event = (await import(pathToFileURL(filePath).href)).default;
 
         const runEvent = async (...args) => {
           try {
@@ -99,24 +98,25 @@ process.on('unhandledRejection', (error) => {
 
 await mongoDBConnect();
 
+client.once(Events.ClientReady, async () => {
+  let recovered = false;
+  let ticking = false;
+  const run = async () => {
+    if (ticking) return;
+    ticking = true;
+    try {
+      await pomodoro.serial(() => recovered ? pomodoro.tick() : pomodoro.recover(client));
+      recovered = true;
+    } catch (error) { console.error('Pomodoro worker:', error); } finally { ticking = false; }
+  };
+  // A single worker handles persisted deadlines; idle presets create no timer jobs.
+  setInterval(run, 5000);
+  await run();
+});
+
 await client.login(config.DISCORD_TOKEN);
 
 await schedules();
-
-// put pomodoro schedule job
-const pomodoroGroupRes = await PomodoroGroup.find();
-if (pomodoroGroupRes.length > 0) {
-  // eslint-disable-next-line no-console
-  console.info(
-    `Bot found ${pomodoroGroupRes.length} pomodoro group(s), ${pomodoroGroupRes
-      .map((group) => group.name)
-      .join(', ')}`,
-  );
-  pomodoroGroupRes.forEach((group) => {
-    const { name, timeOption, startTimeStamp, channelId } = group;
-    putPomodoroScheduleJob({ groupName: name, timeOption, startTimeStamp, channelId });
-  });
-}
 
 if (process.env.NODE_ENV === 'production') {
   // login() resolves on READY, while the log guild is still an unavailable stub with no channels.
