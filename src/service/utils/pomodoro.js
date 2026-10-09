@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import PomodoroGroup from '../../models/pomodoro-group.js';
 import PomodoroStage from '../../models/pomodoro-stage.js';
-import { PRESETS, parsePattern, startStage, attendanceFor } from './pomodoro-timing.js';
+import { PRESETS, parsePattern, startStage, attendanceFor, recoverTiming } from './pomodoro-timing.js';
 
 const button = (label, action, id, style = 2) => ({
   type: 2, label, custom_id: `pomodoro:${action}:${id}`, style,
@@ -16,7 +16,7 @@ export function subscribedDuration(joinedAt, endedAt) {
 }
 
 export function controllerOf(group) {
-  if (group.members.includes(group.ownerId)) return group.ownerId;
+  if (group.members.includes(group.controllerId)) return group.controllerId;
   return [...group.members].sort((a, b) =>
     (group.joinedAt.get(a) ?? 0) - (group.joinedAt.get(b) ?? 0))[0];
 }
@@ -84,7 +84,7 @@ allowedMentions: { parse: [] } };
     if (group.checkIn) {
       try { await this.publishCheckIn(group, true); } catch (error) { console.error('Pomodoro final check-in update:', error); }
     }
-    Object.assign(group, { checkIn: undefined, members: [] });
+    Object.assign(group, { checkIn: undefined, members: [], controllerId: undefined });
     if (group.permanent) {
       Object.assign(group, {
         members: [],
@@ -223,6 +223,7 @@ dirty: true,
       announcementPending: true,
     });
     absent.forEach((id) => group.joinedAt.delete(id));
+    Object.assign(group, { controllerId: controllerOf(group) });
     if (!group.members.length) {
       // No advance() follows when the group empties. Include the study stage
       // that just elapsed in the session summary, without granting study credit.
@@ -255,7 +256,7 @@ dirty: true,
     if (nextIndex % 2 === 0) {
       Object.assign(group, { studyRound: (group.studyRound || 1) + 1 });
     }
-    startStage(group, nextIndex, this.now());
+    startStage(group, nextIndex, skipped ? this.now() : group.stageEndsAt);
     if (!skipped) {
       Object.assign(group, { checkIn: {
         id: endedId,
@@ -309,6 +310,7 @@ dirty: true,
       displayName: name,
       guildId: interaction.guildId,
       ownerId: interaction.user.id,
+      controllerId: interaction.user.id,
       timeOption,
       startTimeStamp: now,
       studyRound: 1,
@@ -335,11 +337,13 @@ dirty: true,
       if (group.channelId !== interaction.channelId) group.statusMessageId = undefined;
       group.channelId = interaction.channelId;
       group.ownerId = interaction.user.id;
+      group.controllerId = interaction.user.id;
       group.startTimeStamp = now;
       group.studyRound = 1;
       group.completedRounds = 0;
       startStage(group, 0, now);
     }
+    group.controllerId = controllerOf(group) || interaction.user.id;
     group.members.push(interaction.user.id);
     group.joinedAt.set(interaction.user.id, now);
     if (starting) this.initialCheckIn(group);
@@ -359,6 +363,7 @@ dirty: true,
     };
     group.members = group.members.filter((userId) => userId !== interaction.user.id);
     group.joinedAt.delete(interaction.user.id);
+    Object.assign(group, { controllerId: controllerOf(group) });
     group.respondedMembers = (group.respondedMembers || [])
       .filter((userId) => userId !== interaction.user.id);
     if (!group.members.length) await this.finish(group);
@@ -546,15 +551,6 @@ dirty: true,
 
   async recover(client) {
     this.client = client;
-    // Upgrade existing two-minute check-ins before enforcing expiration.
-    const activeChecks = await this.groups.find({ checkIn: { $exists: true } });
-    for (const group of activeChecks) {
-      if (group.checkIn && group.stageEndsAt && group.checkIn.deadline !== group.stageEndsAt) {
-        group.checkIn.deadline = group.stageEndsAt;
-        group.checkIn.dirty = true;
-        await group.save();
-      }
-    }
     // Migrate existing groups in place without guessing attendance before upgrade.
     const legacy = await this.groups.find({ guildId: { $exists: false } });
     for (const group of legacy) {
@@ -580,6 +576,16 @@ dirty: true,
         }
         await group.save();
       } catch (error) { console.error(`Could not migrate Pomodoro ${group._id}:`, error); }
+    }
+    const active = await this.groups.find({ guildId: { $exists: true } });
+    for (const group of active) {
+      if (!group.members.length) continue;
+      // Outstanding prompts cannot fairly enforce attendance across downtime.
+      // Close them without removals or automatically confirming any ledger rows.
+      if (group.checkIn) await this.closeCheckIn(group, false);
+      Object.assign(group, { controllerId: controllerOf(group) });
+      recoverTiming(group, this.now());
+      await group.save();
     }
     await this.tick();
   }
