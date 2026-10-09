@@ -101,7 +101,7 @@ await mongoDBConnect();
 
 await client.login(config.DISCORD_TOKEN);
 
-schedules();
+await schedules();
 
 // put pomodoro schedule job
 const pomodoroGroupRes = await PomodoroGroup.find();

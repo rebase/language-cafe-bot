@@ -1,5 +1,6 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 import Event from '../../../models/event.js';
+import EventHistory from '../../../models/event-history.js';
 import EventParticipant from '../../../models/event-participant.js';
 import EventSubmission from '../../../models/event-submission.js';
 import EventBan from '../../../models/event-ban.js';
@@ -8,6 +9,7 @@ import channelLog, { generateSystemLogContent } from '../../utils/channel-log.js
 import { refreshEventCalendar } from '../../utils/event-calendar.js';
 import { findByIdOrName } from '../../utils/event-utils.js';
 import { hasManageEventsPermission } from '../../utils/permissions.js';
+import { syncEventHistory, refreshEventTracker } from '../../utils/event-tracker.js';
 
 /**
  * /event remove
@@ -78,6 +80,13 @@ export async function handleEventRemoveConfirm(interaction) {
     return interaction.editReply({ content: '❌ Event not found.', components: [] });
   }
 
+  await syncEventHistory(event);
+  // Invalidate unfinished events only in permanent history.
+  if (event.endDate > new Date()) {
+    await EventHistory.updateOne({ emsEventId: eventId }, { $set: { isValid: false } });
+  }
+
+  // Permanent history survives deletion of operational data.
   await Promise.all([
     EventParticipant.deleteMany({ eventId }),
     EventSubmission.deleteMany({ eventId }),
@@ -95,6 +104,7 @@ export async function handleEventRemoveConfirm(interaction) {
   );
 
   await refreshEventCalendar();
+  await refreshEventTracker();
 
   return interaction.editReply({
     content: `🗑️ Event **${event.name}** and all associated data have been permanently deleted.`,

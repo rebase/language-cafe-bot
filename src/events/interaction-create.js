@@ -45,6 +45,12 @@ export default {
         handleEventNameAutocomplete(interaction);
         return;
       }
+      if (interaction.commandName === 'channel') {
+        const { handleChannelEmojiAutocomplete } =
+          await import('../service/interaction/is-autocomplete/channel-emoji-autocomplete.js');
+        handleChannelEmojiAutocomplete(interaction);
+        return;
+      }
       if (interaction.commandName === 'live-event') {
         const { handleLiveEventNameAutocomplete } =
           await import('../service/interaction/is-autocomplete/live-event-name-autocomplete.js');
