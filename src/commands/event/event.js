@@ -102,6 +102,14 @@ const data = new SlashCommandBuilder()
           .setName('event_post_link')
           .setDescription('Optional link to the original event post')
           .setRequired(false),
+      )
+      .addChannelOption((o) =>
+        o
+          .setName('language_channel')
+          .setDescription(
+            'Language channel this event counts towards (defaults to submission channel)',
+          )
+          .setRequired(false),
       ),
   )
 
@@ -158,6 +166,12 @@ const data = new SlashCommandBuilder()
         o
           .setName('event_post_link')
           .setDescription('New event post link (leave blank to clear)')
+          .setRequired(false),
+      )
+      .addChannelOption((o) =>
+        o
+          .setName('language_channel')
+          .setDescription('Override the monitored language channel for this event in history')
           .setRequired(false),
       ),
   )

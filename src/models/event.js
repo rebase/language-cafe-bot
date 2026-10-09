@@ -21,6 +21,7 @@ const eventSchema = new Schema(
       type: String,
       required: true,
     },
+    languageChannelId: { type: String, default: null },
     startDate: {
       type: Date,
       required: true,
