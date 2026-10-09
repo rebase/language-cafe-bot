@@ -3,12 +3,14 @@ import { ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from
 export default async (interaction) => {
   const modal = new ModalBuilder()
     .setCustomId('create-a-new-match-match-topic')
-    .setTitle('Create new match-match topic(s)');
+    .setTitle('Create match-match topics');
 
   const topic = new TextInputBuilder()
     .setCustomId('topic')
-    .setLabel('Topics to create, one per line')
-    .setPlaceholder('Animals\nCountries\nFood and drinks')
+    .setLabel('One topic per line (max 256 chars each)')
+    .setPlaceholder('water\nsun\nbook')
+    .setRequired(true)
+    .setMaxLength(4000)
     .setStyle(TextInputStyle.Paragraph);
 
   modal.addComponents(new ActionRowBuilder().addComponents(topic));

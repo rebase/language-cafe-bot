@@ -3,7 +3,7 @@ import client from '../../client/index.js';
 import config from '../../config/index.js';
 import { COLORS } from '../../constants/index.js';
 import MatchMatchMessage from '../../models/match-match-message.js';
-import MatchMatchTopic from '../../models/match-match-topic.js';
+import MatchMatchTopic, { TOPIC_ORDER } from '../../models/match-match-topic.js';
 import Point from '../../models/point.js';
 
 const { MATCH_MATCH_CHANNEL_ID: matchMatchChannelId, MATCH_MATCH_COMMAND_ID: matchMatchCommandId } =
@@ -66,7 +66,7 @@ const sendANewMatchMatchMessage = async () => {
     }
 
     // Same topic users submitted against (see participate-match-match.js)
-    const matchMatchTopics = await MatchMatchTopic.find().sort({ createdAt: 1 }).limit(1);
+    const matchMatchTopics = await MatchMatchTopic.find().sort(TOPIC_ORDER).limit(1);
 
     if (matchMatchTopics.length === 0) {
       await channel.send({
@@ -207,7 +207,18 @@ const sendANewMatchMatchMessage = async () => {
 
     await Promise.all(stickyMessages.map((msg) => msg.delete().catch(() => {})));
 
-    const currentMatchMatchTopic = await MatchMatchTopic.findOne().sort({ createdAt: 1 });
+    const currentMatchMatchTopic = await MatchMatchTopic.findOne().sort(TOPIC_ORDER);
+    if (!currentMatchMatchTopic) {
+      await channel.send({
+        embeds: [{
+          color: COLORS.PRIMARY,
+          title: stickyMessageTitle,
+          description:
+            "There's no match-match topic left.\nPlease ping the moderator to create a new topic.",
+        }],
+      });
+      return;
+    }
     const numberOfSubmissions = await MatchMatchMessage.countDocuments();
 
     await channel.send({

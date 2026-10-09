@@ -4,7 +4,7 @@ import createNewCategory from '../../service/interaction/is-chat-input-command/c
 export default {
   data: new SlashCommandBuilder()
     .setName('create-new-category')
-    .setDescription('Create one or more categories (one per line)')
+    .setDescription('Create new category')
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
   async execute(interaction) {

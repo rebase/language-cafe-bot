@@ -1,7 +1,7 @@
 import config from '../../../config/index.js';
 import { COLORS } from '../../../constants/index.js';
 import MatchMatchMessage from '../../../models/match-match-message.js';
-import MatchMatchTopic from '../../../models/match-match-topic.js';
+import MatchMatchTopic, { TOPIC_ORDER } from '../../../models/match-match-topic.js';
 
 const { CLIENT_ID: clientId, MATCH_MATCH_COMMAND_ID: matchMatchCommandId } = config;
 
@@ -9,7 +9,7 @@ export default async (interaction) => {
   try {
     await interaction.deferReply({ ephemeral: true });
 
-    const currentMatchMatchTopic = await MatchMatchTopic.findOne().sort({ createdAt: 1 });
+    const currentMatchMatchTopic = await MatchMatchTopic.findOne().sort(TOPIC_ORDER);
 
     if (!currentMatchMatchTopic) {
       await interaction.editReply({

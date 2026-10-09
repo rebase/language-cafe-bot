@@ -1,6 +1,6 @@
 import { PermissionFlagsBits, SlashCommandBuilder } from 'discord.js';
 import { COLORS } from '../../constants/index.js';
-import MatchMatchTopic from '../../models/match-match-topic.js';
+import MatchMatchTopic, { TOPIC_ORDER } from '../../models/match-match-topic.js';
 import channelLog, {
   generateInteractionCreateLogContent,
 } from '../../service/utils/channel-log.js';
@@ -17,7 +17,7 @@ export default {
 
       await interaction.deferReply({ ephemeral: true });
 
-      const matchMatchTopics = await MatchMatchTopic.find().sort({ createdAt: 1 });
+      const matchMatchTopics = await MatchMatchTopic.find().sort(TOPIC_ORDER);
 
       const description = matchMatchTopics
         .map((matchMatchTopic) => matchMatchTopic.topic)

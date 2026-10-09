@@ -2,6 +2,7 @@ import Event from '../../../models/event.js';
 import channelLog, { generateSystemLogContent } from '../../utils/channel-log.js';
 import { findByIdOrName, normaliseHashtag } from '../../utils/event-utils.js';
 import { refreshEventCalendar } from '../../utils/event-calendar.js';
+import { syncEventHistory, refreshEventTracker } from '../../utils/event-tracker.js';
 
 /**
  * /event edit
@@ -96,13 +97,29 @@ export default async function editEvent(interaction) {
     changed.push('event_post_link');
   }
 
-  if (changed.length === 0) {
+  // Language channel override for permanent history
+  const langChannelOpt = interaction.options.getChannel('language_channel');
+  if (langChannelOpt) {
+    updates.languageChannelId = langChannelOpt.id;
+    changed.push('language_channel');
+  }
+
+  if (startDateStr || endDateStr) {
+    const now = new Date();
+    updates.status = newEnd <= now ? 'ended' : newStart <= now ? 'active' : 'pending';
+  }
+
+  if (changed.length === 0 && !langChannelOpt) {
     return interaction.editReply('ℹ️ No changes provided.');
   }
 
   const updated = await Event.findByIdAndUpdate(event._id, updates, { new: true });
 
+  // Sync permanent history record — pass new languageChannelId if it was changed
+  await syncEventHistory(updated, langChannelOpt?.id ?? null);
+
   await refreshEventCalendar();
+  await refreshEventTracker();
 
   channelLog(
     generateSystemLogContent('Event Edited', {

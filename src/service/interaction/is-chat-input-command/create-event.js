@@ -2,6 +2,7 @@ import Event from '../../../models/event.js';
 import channelLog, { generateSystemLogContent } from '../../utils/channel-log.js';
 import { normaliseHashtag } from '../../utils/event-utils.js';
 import { refreshEventCalendar } from '../../utils/event-calendar.js';
+import { syncEventHistory, refreshEventTracker } from '../../utils/event-tracker.js';
 
 /**
  * /event create
@@ -20,6 +21,8 @@ export default async function createEvent(interaction) {
     interaction.options.getInteger('max_points') ?? (pointsPerSubmission ? 200 : null);
   const creatorBonus = interaction.options.getInteger('creator_bonus') ?? 0;
   const eventPostLink = interaction.options.getString('event_post_link') ?? null;
+  // Language channel for permanent history — defaults to submission channel if not specified
+  const languageChannel = interaction.options.getChannel('language_channel') ?? submissionChannel;
 
   // If points_per_submission is set, max_points defaults to 200 but can be overridden.
   // If neither is set, both remain null (tracking-only mode).
@@ -54,6 +57,7 @@ export default async function createEvent(interaction) {
     eventType,
     hashtag,
     submissionChannelId: submissionChannel.id,
+    languageChannelId: languageChannel.id,
     startDate,
     endDate,
     pointsPerSubmission,
@@ -66,7 +70,11 @@ export default async function createEvent(interaction) {
 
   await event.save();
 
+  // Create permanent history record — survives /event remove
+  await syncEventHistory(event, languageChannel.id);
+
   await refreshEventCalendar();
+  await refreshEventTracker();
 
   channelLog(
     generateSystemLogContent('Event Created', {
@@ -75,6 +83,7 @@ export default async function createEvent(interaction) {
       type: `\`${event.eventType}\``,
       hashtag: `\`${event.hashtag}\``,
       channel: `<#${submissionChannel.id}>`,
+      languageChannel: `<#${languageChannel.id}>`,
       status: `\`${status}\``,
       creator: `<@${interaction.user.id}>`,
     }),

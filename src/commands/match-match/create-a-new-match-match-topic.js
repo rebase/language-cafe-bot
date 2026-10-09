@@ -4,7 +4,7 @@ import createANewMatchMatchTopic from '../../service/interaction/is-chat-input-c
 export default {
   data: new SlashCommandBuilder()
     .setName('create-a-new-match-match-topic')
-    .setDescription('Create one or more match match topics (one per line)')
+    .setDescription('Create new match match topic')
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
   async execute(interaction) {

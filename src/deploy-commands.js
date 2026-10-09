@@ -1,7 +1,7 @@
 import { REST, Routes } from 'discord.js';
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import config from './config/index.js';
 
 const { CLIENT_ID: cliendId, DISCORD_TOKEN: discordToken } = config;
@@ -27,7 +27,7 @@ const commandFolders = fs.readdirSync(foldersPath);
       console.info(filePath);
 
       // eslint-disable-next-line no-await-in-loop
-      const command = (await import(filePath)).default;
+      const command = (await import(pathToFileURL(filePath).href)).default;
 
       if ('data' in command && 'execute' in command) {
         commands.push(command.data.toJSON());
@@ -46,7 +46,8 @@ const commandFolders = fs.readdirSync(foldersPath);
   try {
     console.info(`Started refreshing ${commands.length} application (/) commands.`);
 
-    // The put method is used to fully refresh all commands in the guild with the current set
+    // Bulk overwrite removes obsolete global commands, including the four old
+    // standalone Pomodoro commands, while registering /pomodoro subcommands.
     const data = await rest.put(Routes.applicationCommands(cliendId), {
       body: commands,
     });
