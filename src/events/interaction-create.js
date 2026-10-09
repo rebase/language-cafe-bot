@@ -1,7 +1,7 @@
 import { Events } from 'discord.js';
 import getExchangeListing from '../service/interaction/is-button/get-exchange-listing.js';
 import getStudyBuddyListing from '../service/interaction/is-button/get-study-buddy-listing.js';
-import joinPomodoroGroup from '../service/interaction/is-button/join-pomodoro-group.js';
+import pomodoro from '../service/utils/pomodoro.js';
 import cooldown from '../service/interaction/is-chat-input-command/cooldown.js';
 import createNewCategory from '../service/interaction/is-modal-submit/create-new-category.js';
 import GeneratePollModalSubmit from '../service/interaction/is-modal-submit/generate-poll.js';
@@ -124,8 +124,12 @@ export default {
         getStudyBuddyListing(interaction);
         return;
       }
+      if (interaction.customId.startsWith('pomodoro:')) {
+        await pomodoro.handle(interaction);
+        return;
+      }
       if (interaction.customId.startsWith('join-pomodoro-group')) {
-        joinPomodoroGroup(interaction);
+        await interaction.reply({ content: 'Use /pomodoro join for the updated group list.', ephemeral: true });
         return;
       }
       if (interaction.customId.startsWith('dm-server-tutorial')) {
