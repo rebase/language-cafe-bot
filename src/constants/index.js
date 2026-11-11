@@ -103,8 +103,8 @@ export const LANGUAGE_CHANNELS = {
 
 export const ALL_LANGUAGES = Object.keys(LANGUAGE_CHANNELS);
 
-// URL to name pairs.
-export const ALL_LANGUAGES_URL_TO_NAME = {
+// All the languages on the website.
+export const WEBSITE_LANGUAGES_URL_TO_NAME = {
   afrikaans: 'Afrikaans',
   akan: 'Akan',
   albanian: 'Albanian',
@@ -217,8 +217,7 @@ export const ALL_LANGUAGES_URL_TO_NAME = {
   swahili: 'Swahili',
   swazi: 'Swazi',
   swedish: 'Swedish',
-  sami: 'Sámi', // Without the accent
-  sámi: 'Sámi', // With the accent
+  sámi: 'Sámi',
   tagalog: 'Tagalog',
   tahitian: 'Tahitian',
   tamazight: 'Tamazight (Amazigh)',
@@ -243,4 +242,97 @@ export const ALL_LANGUAGES_URL_TO_NAME = {
   zulu: 'Zulu',
 };
 
-export const ALL_LANGUAGES_URL = Object.keys(ALL_LANGUAGES_URL_TO_NAME);
+export const WEBSITE_LANGUAGES_URL = Object.keys(WEBSITE_LANGUAGES_URL_TO_NAME);
+
+export const LANGUAGE_ALIASES = {
+  // Chinese
+  chinese: 'mandarin',
+  'mandarin chinese': 'mandarin',
+  'simplified chinese': 'mandarin',
+  zh: 'mandarin',
+  'zh cn': 'mandarin',
+
+  // English
+  en: 'english',
+
+  // Spanish
+  espanol: 'spanish',
+  castellano: 'spanish',
+  es: 'spanish',
+
+  // Portuguese
+  portugues: 'portuguese',
+  pt: 'portuguese',
+  'pt br': 'portuguese',
+
+  // French
+  francais: 'french',
+  fr: 'french',
+
+  // German
+  deutsch: 'german',
+  de: 'german',
+
+  // Japanese
+  nihongo: 'japanese',
+  jp: 'japanese',
+  ja: 'japanese',
+
+  // Korean
+  hangul: 'korean',
+  ko: 'korean',
+  kr: 'korean',
+
+  // Arabic
+  ar: 'arabic',
+
+  // Russian
+  ru: 'russian',
+
+  // Hindi
+  hi: 'hindi',
+
+  // Malay-Indonesian
+  bahasa: 'malay indonesian',
+  'bahasa indonesia': 'malay indonesian',
+  id: 'malay indonesian',
+  melayu: 'malay indonesian',
+
+  // Italian
+  italiano: 'italian',
+  it: 'italian',
+
+  // Dutch
+  nederlands: 'dutch',
+  nl: 'dutch',
+
+  // Turkish
+  turkce: 'turkish',
+  tr: 'turkish',
+
+  // Vietnamese
+  'tieng viet': 'vietnamese',
+  vi: 'vietnamese',
+
+  // Thai
+  th: 'thai',
+
+  // Bengali
+  bangla: 'bengali',
+  bn: 'bengali',
+
+  // Ukrainian
+  uk: 'ukrainian',
+
+  // Persian
+  farsi: 'persian',
+  fa: 'persian',
+
+  // Greek
+  'modern greek': 'greek modern',
+  'greek ancient': 'ancient greek',
+
+  // URLs with accents
+  sami: 'sámi',
+  guarani: 'guaraní',
+};
