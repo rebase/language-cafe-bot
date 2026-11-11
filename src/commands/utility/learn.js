@@ -1,10 +1,14 @@
 import { SlashCommandBuilder, ButtonStyle, ButtonBuilder, ActionRowBuilder } from 'discord.js';
+import config from '../../config/index.js';
 import {
   LANGUAGE_ALIASES,
   WEBSITE_LANGUAGES_URL,
   WEBSITE_LANGUAGES_URL_TO_NAME,
+  GENERAL_CHANNELS,
   COLORS,
 } from '../../constants/index.js';
+
+const { SERVER_ID: serverId } = config;
 
 const MAX_NUM_MATCHES_TO_SHOW = 3;
 
@@ -41,7 +45,7 @@ for (const language of WEBSITE_LANGUAGES_URL) {
 /**
  * Returns an array of languages based on a normalized query.
  * Example matches (query -> match)
- * - "greek" -> "Greek (Modern), Ancient Greek"
+ * - "greek" -> "Greek (Modern)"
  * - "ge" -> "Georgian, German"
  * - "germ" -> "German"
  * - "ma" -> "Macedonian, Malagasy, Malay-Indonesian, plus 4 more."
@@ -64,11 +68,8 @@ function matchLanguages(query) {
 
     if (normalized.startsWith(query) || compact.startsWith(query)) {
       scores[urlName] += 100;
-      continue;
     }
 
-    // This is designed in such a way that for a query `greek`, the languages
-    // 'Ancient Greek' and 'Greek (Modern)' get the same score.
     const splitQuery = [...query.split(' '), query];
     // No reasonable query is more than four parts long including the word itself.
     if (splitQuery.length > 4) return [];
@@ -111,14 +112,16 @@ export default {
     await interaction.deferReply();
     const rawQuery = interaction.options.getString('language');
     const resourcesText = `\
-## 📚 Resources
+### 📚 Resources
 Check out our **100+ language learning resources**, including websites, apps, study tools, dictionaries, and more!
 🔗 <https://www.languagecafe.world/languages>
 `;
     const faqText = `\
-## 💡 Language Learning & Studying Tips
+### 💡 Language Learning & Studying Tips
 Not sure how to study effectively or looking for ways to improve your routine? **See our tips** to help you get started and make the most of your study time.
 🔗 <https://www.languagecafe.world/faq>
+
+*Also see this server's https://discord.com/channels/${serverId}/${GENERAL_CHANNELS.resourceDrawer} for resources recommended by our community.*
 `;
 
     const deleteLearnMessageButton = new ButtonBuilder()
@@ -147,7 +150,7 @@ Not sure how to study effectively or looking for ways to improve your routine? *
 
     const numMatches = matched.length;
     if (numMatches > 1) {
-      queryReply = 'Links that match query: ';
+      queryReply = 'Matching links found: ';
       const numOfMatchesToShow =
         numMatches > MAX_NUM_MATCHES_TO_SHOW ? MAX_NUM_MATCHES_TO_SHOW : numMatches;
       for (let i = 0; i < numOfMatchesToShow; i++) {
@@ -161,7 +164,7 @@ Not sure how to study effectively or looking for ways to improve your routine? *
     } else if (numMatches === 1) {
       queryReply = `Here is the direct link for ${createDisplayLink(matched[0])}.`;
     } else {
-      queryReply = 'No match found for query.';
+      queryReply = '-# No match found for query.';
     }
 
     const withQueryEmbed = {
