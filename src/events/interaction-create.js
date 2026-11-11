@@ -22,6 +22,7 @@ import {
   handleLiveEventRemoveConfirm,
   handleLiveEventRemoveCancel,
 } from '../service/interaction/is-chat-input-command/live-event-remove.js';
+import learnCommand from '../service/interaction/is-button/learn-command.js';
 
 export default {
   name: Events.InteractionCreate,
@@ -134,7 +135,6 @@ export default {
       }
       if (interaction.customId.startsWith('dm-server-tutorial')) {
         dmServerTutorial(interaction);
-        // eslint-disable-next-line no-useless-return
         return;
       }
       if (interaction.customId.startsWith('event-remove-confirm:')) {
@@ -151,6 +151,12 @@ export default {
       }
       if (interaction.customId.startsWith('live-event-remove-cancel:')) {
         handleLiveEventRemoveCancel(interaction);
+        return;
+      }
+      if (interaction.customId.startsWith('learn-command')) {
+        learnCommand(interaction);
+        // eslint-disable-next-line no-useless-return
+        return;
       }
     }
   },
