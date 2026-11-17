@@ -61,31 +61,32 @@ export default async function trackerCheckin(message) {
     let dateArgIndex = -1;
     let dateArgCount = 0; // How many args to skip for date
 
-    // Look for relative dates or --date flag
+    // Look for relative dates or date flags
     if (args.length > 2) {
       const dateArg = args[2].toLowerCase();
 
-      // Check for relative dates: yesterday, 2days, 2d, 3days, 3d, etc.
-      if (dateArg === 'yesterday') {
-        targetDate = new Date();
-        targetDate.setDate(targetDate.getDate() - 1);
-        dateArgIndex = 2;
-        dateArgCount = 1;
-      } else if (/^\d+days?$/.test(dateArg) || /^\d+d$/.test(dateArg)) {
-        // Match: 2days, 2day, 2d, 3days, 3d, etc.
-        const daysAgo = parseInt(dateArg.match(/^\d+/)[0], 10);
-        targetDate = new Date();
-        targetDate.setDate(targetDate.getDate() - daysAgo);
-        dateArgIndex = 2;
-        dateArgCount = 1;
-      } else if (dateArg === '--date' && args.length > 3) {
-        // --date flag with explicit date
+      // Check for date flags: --date or —date
+      if (dateArg.startsWith('-') || dateArg.startsWith('—')) {
+        if (dateArg !== '--date' && dateArg !== '—date') {
+          await message.react('❌').catch(() => {});
+          await message.reply(
+            '❌ Invalid date selector. Use `--date YYYY-MM-DD`.',
+          );
+          return;
+        }
+
+        if (args.length <= 3) {
+          await message.react('❌').catch(() => {});
+          await message.reply('❌ Missing date after date selector.');
+          return;
+        }
+
         const dateStr = args[3];
         const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
 
         if (!dateRegex.test(dateStr)) {
           await message.react('❌').catch(() => {});
-          await message.reply('❌ Invalid date format. Use YYYY-MM-DD after --date flag');
+          await message.reply('❌ Invalid date format. Use YYYY-MM-DD after --date flag.');
           return;
         }
 
@@ -96,11 +97,25 @@ export default async function trackerCheckin(message) {
           }
         } catch (error) {
           await message.react('❌').catch(() => {});
-          await message.reply('❌ Invalid date format. Use YYYY-MM-DD after --date flag');
+          await message.reply('❌ Invalid date format. Use YYYY-MM-DD after --date flag.');
           return;
         }
+
         dateArgIndex = 2;
-        dateArgCount = 2; // Skip both --date and the date value
+        dateArgCount = 2;
+      // Check for relative dates: yesterday, 2days, 2d, 3days, 3d, etc.
+      } else if (dateArg === 'yesterday') { 
+        targetDate = new Date();
+        targetDate.setDate(targetDate.getDate() - 1);
+        dateArgIndex = 2; // Skip both --date and the date value
+        dateArgCount = 1;
+      } else if (/^\d+days?$/.test(dateArg) || /^\d+d$/.test(dateArg)) { 
+        // Match: 2days, 2day, 2d, 3days, 3d, etc.
+        const daysAgo = parseInt(dateArg.match(/^\d+/)[0], 10);
+        targetDate = new Date();
+        targetDate.setDate(targetDate.getDate() - daysAgo);
+        dateArgIndex = 2;
+        dateArgCount = 1;
       }
     }
 
