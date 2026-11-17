@@ -14,9 +14,11 @@ import { fetchTrackerChannel } from '../utils/tracker-utils.js';
 export default async function trackerWeeklySnapshots() {
   try {
     // Only process daily trackers
+    const now = new Date();
     const dailyTrackers = await Tracker.find({
       isActive: true,
       frequency: 'daily',
+      endDate: { $gte: now },
     });
 
     for (const tracker of dailyTrackers) {
