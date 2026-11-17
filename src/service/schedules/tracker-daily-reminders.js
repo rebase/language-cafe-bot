@@ -37,6 +37,9 @@ async function sendTrackerReminder(tracker) {
     const endDate = new Date(tracker.endDate);
     endDate.setHours(23, 59, 59, 999);
 
+    const endDateAtMidnight = new Date(tracker.endDate);
+    endDateAtMidnight.setHours(0, 0, 0, 0);
+
     // Check if we're within the tracker period
     if (now < startDate || now > endDate) {
       return; // Outside tracker period, don't send reminder
@@ -46,12 +49,15 @@ async function sendTrackerReminder(tracker) {
     const daysSinceStart = Math.floor(
       (now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24),
     );
+
     const dayNumber = daysSinceStart + 1; // Day 1, Day 2, etc.
+    const totalDays = ((endDateAtMidnight.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    const totalWeeks = Math.ceil(totalDays / 7);
 
     if (tracker.frequency === 'daily') {
       // Daily tracker: Send reminder every day
       await channel.send(
-        `📅 Day ${dayNumber} - Don't forget to check in today! Use \`!checkin done <activity>\``,
+        `📅 Day ${dayNumber}/${totalDays} - Don't forget to check in today! Use \`!checkin done <activity>\``,
       );
       channelLog(
         generateSystemLogContent('Tracker Daily Reminder Sent', {
@@ -66,7 +72,7 @@ async function sendTrackerReminder(tracker) {
       if (dayNumber === 1 || (dayNumber - 1) % 7 === 0) {
         const weekNumber = Math.floor((dayNumber - 1) / 7) + 1;
         await channel.send(
-          `📅 Week ${weekNumber} - Don't forget to check in this week! Use \`!checkin done <activity>\``,
+          `📅 Week ${weekNumber}/${totalWeeks} - Don't forget to check in this week! Use \`!checkin done <activity>\``,
         );
         channelLog(
           generateSystemLogContent('Tracker Weekly Reminder Sent', {
