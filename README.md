@@ -1,5 +1,9 @@
 ## Available Commands
 
+### Help & Information
+
+- `?today` - Show today's events
+
 ### Categories
 
 - `/get-categories` - Get categories (Administrator only)
@@ -53,10 +57,6 @@
 - `/ipa` - Get the transcription of a word
 - `/generate-poll` - Generate a poll
 - `/extract-new-members` - Extract new members (Administrator only)
-
-### Information
-
-- `?today` - Show today's events
 
 ## Interactive Message Games
 
