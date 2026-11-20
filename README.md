@@ -1,5 +1,9 @@
 ## Available Commands
 
+### Help & Information
+
+- `?today` - Show today's events
+
 ### Categories
 
 - `/get-categories` - Get categories (Administrator only)
