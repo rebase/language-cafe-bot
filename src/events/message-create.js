@@ -10,6 +10,7 @@ import categories from '../service/messageCreate/categories.js';
 import counting from '../service/messageCreate/counting.js';
 import shiritori from '../service/messageCreate/shiritori.js';
 import letterChange from '../service/messageCreate/letterChange.js';
+import today from '../service/messageCreate/today.js';
 
 const {
   SUGGESTION_BOX_CHANNEL_ID: suggestionBoxChannelId,
@@ -30,6 +31,12 @@ export default {
     // Handle !checkin commands in forum threads
     if (message.content.startsWith('!checkin')) {
       trackerCheckin(message);
+      return;
+    }
+
+    // Handle ?today command
+    if (message.content.startsWith('?today')) {
+      today(message);
       return;
     }
 
