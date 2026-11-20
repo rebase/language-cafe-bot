@@ -54,6 +54,10 @@
 - `/generate-poll` - Generate a poll
 - `/extract-new-members` - Extract new members (Administrator only)
 
+### Information
+
+- `?today` - Show today's events
+
 ## Interactive Message Games
 
 ### Study Check-in System
