@@ -6,6 +6,7 @@ import Plan from '../../models/study-plan.js';
 import Profile from '../../models/study-profile.js';
 import StudyCheckIn from '../../models/StudyCheckIn.js';
 import { recordAttendance } from './study-attendance.js';
+import { refreshStudyHelp } from './study-help.js';
 import { DAY, utcDay, midnight, weekOf, studied, totals, goalProgress, validateGoal, validatePlan, freshActivities, assertEditable } from './study-rules.js';
 
 const shortId = () => randomUUID().replaceAll('-', '').slice(0, 12);
@@ -261,6 +262,7 @@ async function publish(i, plan) {
   try {
     const message = await i.channel.send(data);
     await Plan.updateOne({ _id: plan._id, messageId: claim }, { $set: { messageId: message.id } });
+    await refreshStudyHelp(i.channel, i.client?.user?.id || config.CLIENT_ID, config);
     return message.id;
   } catch (error) {
     await Plan.updateOne({ _id: plan._id, messageId: claim }, { $unset: { messageId: '' } });
@@ -694,7 +696,11 @@ export async function handleStudy(i) {
     }
     if (command === 'template') return reply(i, templatesView(i, profile));
     if (command === 'goals') return reply(i, await goalsView(i, profile));
-    if (command === 'stats') return reply(i, await statsView(i, (i.options.getInteger('page') || 1) - 1));
+    if (command === 'stats') {
+      const result = await reply(i, await statsView(i, (i.options.getInteger('page') || 1) - 1));
+      await refreshStudyHelp(i.channel, i.client?.user?.id || config.CLIENT_ID, config);
+      return result;
+    }
     return undefined;
   } catch (error) {
     const expected = !error.code && error.name !== 'VersionError' && error.name !== 'CastError';
