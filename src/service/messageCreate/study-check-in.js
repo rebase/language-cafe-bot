@@ -2,48 +2,26 @@ import { bold, time, userMention } from 'discord.js';
 import config from '../../config/index.js';
 import { COLORS } from '../../constants/index.js';
 import { recordAttendance } from '../utils/study-attendance.js';
+import { refreshStudyHelp } from '../utils/study-help.js';
 import channelLog, { generateMessageCreateLogContent } from '../utils/channel-log.js';
 
-const sendNewStickyMessage = async (message) => {
-  const title = 'How to Use the study-check-in Bot';
-
-  const description = `Write **!lc-streak** at the beginning of your study plans to start/continue your streak (same message)\n\nUse </current-streak-leaderboard:${config.CURRENT_STREAK_LEADERBOARD_COMMAND_ID}> to see the current streak leaderboard and </all-time-streak-leaderboard:${config.ALL_TIME_STREAK_LEADERBOARD_COMMAND_ID}> for the all-time streak leaderboard\n\nPlease keep in mind that this bot is set to GMT/UTC so all streaks will refresh/expire each day at <t:946684800:t> your time`;
-
-  const currentMessages = await message.channel.messages.fetch({ limit: 50 });
-
-  const stickyMessages = currentMessages.filter(
-    (currentMessage) =>
-      currentMessage?.author?.id === config.CLIENT_ID && currentMessage?.embeds[0]?.title === title,
-  );
-
-  await Promise.all(stickyMessages.map((stickyMessage) => stickyMessage.delete().catch(() => {})));
-
-  await message.channel.send({
-    embeds: [
-      {
-        color: COLORS.PRIMARY,
-        title,
-        description,
-      },
-    ],
-  });
-};
+const sendNewStickyMessage = (message) => refreshStudyHelp(
+  message.channel, message.client?.user?.id || config.CLIENT_ID, config,
+);
 
 export default async (message) => {
   if (!message.content.startsWith('!lc-streak')) {
-    sendNewStickyMessage(message);
+    await sendNewStickyMessage(message);
     return;
   }
 
   if (message.content === '!lc-streak') {
-    sendNewStickyMessage(message);
-
     const embad = {
       color: COLORS.PRIMARY,
       title: 'Study Check In',
       description: `${userMention(
         message.author.id,
-      )}, If you want your streak to count, make sure to include your tasks for today in your streak message and not just \`!lc-streak\`! Scroll up for formatting examples if you need help!\n### This message will be deleted in 1 minute.`,
+      )}, If you want your streak to count, include your study plan after \`!lc-streak\`, or use \`/study start\` for an interactive plan.\n### This message will be deleted in 1 minute.`,
     };
 
     message.react('❌').catch(() => {});
@@ -53,6 +31,7 @@ export default async (message) => {
       replyMessage.delete().catch(() => {});
     }, 1000 * 60);
 
+    await sendNewStickyMessage(message);
     return;
   }
 
@@ -101,7 +80,7 @@ export default async (message) => {
       replyMessage.delete().catch(() => {});
     }, 1000 * 60);
 
-    sendNewStickyMessage(message);
+    await sendNewStickyMessage(message);
 
     return;
   }
@@ -220,5 +199,5 @@ export default async (message) => {
     1000 * 60 * 3,
   );
 
-  sendNewStickyMessage(message);
+  await sendNewStickyMessage(message);
 };
