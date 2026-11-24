@@ -14,12 +14,25 @@ import { fetchTrackerChannel } from '../utils/tracker-utils.js';
 export default async function trackerWeeklySnapshots() {
   try {
     // Only process daily trackers
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+
     const dailyTrackers = await Tracker.find({
       isActive: true,
       frequency: 'daily',
+      startDate: { $lte: now },
     });
 
     for (const tracker of dailyTrackers) {
+      const gracePeriodEnd = new Date(tracker.endDate);
+      gracePeriodEnd.setDate(
+        gracePeriodEnd.getDate() + tracker.gracePeriodDays,
+      );
+      gracePeriodEnd.setHours(0, 0, 0, 0);
+
+      if (now > gracePeriodEnd) {
+        continue;
+      }
       await createWeeklySnapshot(tracker);
     }
 
