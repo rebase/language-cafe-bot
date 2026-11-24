@@ -1,4 +1,5 @@
 import { Events } from 'discord.js';
+import { handleStudy } from '../service/utils/study.js';
 import getExchangeListing from '../service/interaction/is-button/get-exchange-listing.js';
 import getStudyBuddyListing from '../service/interaction/is-button/get-study-buddy-listing.js';
 import pomodoro from '../service/utils/pomodoro.js';
@@ -26,6 +27,10 @@ import {
 export default {
   name: Events.InteractionCreate,
   async execute(interaction) {
+    if (interaction.customId?.startsWith('study:')) {
+      await handleStudy(interaction);
+      return;
+    }
     // ── Autocomplete ──────────────────────────────────────────────────────────
     if (interaction.isAutocomplete()) {
       channelLog(
