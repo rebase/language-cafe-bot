@@ -1,7 +1,7 @@
 import { bold, time, userMention } from 'discord.js';
 import config from '../../config/index.js';
 import { COLORS } from '../../constants/index.js';
-import StudyCheckIn from '../../models/StudyCheckIn.js';
+import { recordAttendance } from '../utils/study-attendance.js';
 import channelLog, { generateMessageCreateLogContent } from '../utils/channel-log.js';
 
 const sendNewStickyMessage = async (message) => {
@@ -56,16 +56,11 @@ export default async (message) => {
     return;
   }
 
-  const user = await StudyCheckIn.findOne({ userId: message.author.id });
+  const attendance = await recordAttendance(message.author.id);
+  const user = attendance.previous;
 
-  const currentDate = new Date();
-  const nextDayTemp = new Date(currentDate);
-  nextDayTemp.setDate(currentDate.getDate() + 1);
-  nextDayTemp.setHours(23, 59, 59, 0);
-  const nextDay = new Date(nextDayTemp);
-
-  const expiredTimestamp = nextDay.getTime();
-  const currentTimestamp = currentDate.getTime();
+  const currentDate = new Date(attendance.user.lastAttendanceTimestamp);
+  const { expiredTimestamp } = attendance.user;
 
   // check if user.lastAttendanceTimestamp and currentTimestamp is in the same day
   const lastAttendanceDay = user?.lastAttendanceTimestamp
@@ -73,7 +68,7 @@ export default async (message) => {
     : null;
   const currentDay = currentDate?.toISOString().split('T')[0];
 
-  const isSameDay = lastAttendanceDay === currentDay;
+  const isSameDay = attendance.already;
 
   channelLog(
     generateMessageCreateLogContent(
@@ -83,8 +78,8 @@ export default async (message) => {
   );
 
   const ableToAttendDate = new Date(currentDate);
-  ableToAttendDate.setDate(currentDate.getDate() + 1);
-  ableToAttendDate.setHours(0, 0, 0, 0);
+  ableToAttendDate.setUTCDate(currentDate.getUTCDate() + 1);
+  ableToAttendDate.setUTCHours(0, 0, 0, 0);
   const ableToAttendTimestamp = ableToAttendDate.getTime();
 
   if (isSameDay) {
@@ -111,43 +106,7 @@ export default async (message) => {
     return;
   }
 
-  let freezePoint = user?.freezePoint ?? 0;
-
-  if (user?.expiredTimestamp < currentTimestamp) {
-    const differenceDays = Math.ceil(
-      (currentTimestamp - user.expiredTimestamp) / (1000 * 60 * 60 * 24),
-    );
-
-    freezePoint -= differenceDays;
-
-    if (freezePoint < 0) {
-      freezePoint = 0;
-      user.point = 0;
-    }
-  }
-
-  let point = user?.point ?? 0;
-  point += 1;
-
-  const highestPoint = (user?.highestPoint ?? 0) > point ? user?.highestPoint : point;
-
-  const isPointMultipleOf7 = point % 7 === 0;
-
-  if (isPointMultipleOf7) {
-    freezePoint = freezePoint < 3 ? freezePoint + 1 : freezePoint;
-  }
-
-  await StudyCheckIn.findOneAndUpdate(
-    { userId: message.author.id },
-    {
-      point,
-      lastAttendanceTimestamp: currentTimestamp,
-      expiredTimestamp,
-      highestPoint,
-      freezePoint,
-    },
-    { upsert: true, new: true },
-  );
+  const { point, freezePoint } = attendance.user;
 
   if (
     point <= 50
